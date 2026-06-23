@@ -1,3 +1,6 @@
+# Copyright 2026 Raban Heller
+# SPDX-License-Identifier: Apache-2.0
+
 #!/usr/bin/env bash
 # sync_style.sh — copy the central Coder Design System into one app repo.
 # Run from inside an app repo:  bash tool/sync_style.sh <track>

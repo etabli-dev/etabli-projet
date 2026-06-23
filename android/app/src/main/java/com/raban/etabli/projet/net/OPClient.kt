@@ -1,3 +1,6 @@
+// Copyright 2026 Raban Heller
+// SPDX-License-Identifier: Apache-2.0
+
 package com.raban.etabli.projet.net
 
 import android.content.Context
