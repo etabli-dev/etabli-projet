@@ -1,0 +1,9 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1024" height="1024" fill="#28A745"/>
+  <g id="glyph" fill="#FFFFFF" stroke="none">
+    <!-- Three stacked task bars, slightly offset like a small Gantt chart -->
+    <rect x="280" y="340" width="380" height="80" rx="14"/>
+    <rect x="360" y="472" width="430" height="80" rx="14"/>
+    <rect x="300" y="604" width="320" height="80" rx="14"/>
+  </g>
+</svg>

@@ -1,0 +1,52 @@
+# ---- macOS ----
+.DS_Store
+
+# ---- Xcode / iOS ----
+build/
+DerivedData/
+*.xcuserstate
+*.xcscmblueprint
+xcuserdata/
+*.moved-aside
+.swiftpm/
+
+# ---- Android / Gradle ----
+*.iml
+.gradle/
+local.properties
+/android/build/
+/android/app/build/
+/build/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# ---- SIGNING SECRETS — never commit these ----
+*.keystore
+*.jks
+keystore.properties
+*.p12
+*.mobileprovision
+ExportOptions.plist
+google-services.json
+fastlane/report.xml
+fastlane/Appfile
+
+# ---- Flutter / Dart ----
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+**/doc/api/
+
+# ---- IDE ----
+.idea/
+.vscode/
+
+# ---- F-Droid: keep recipe + provenance, ignore fetched runtime blobs ----
+# .fdroid.yml, THIRD_PARTY.md, tool/fetch_runtimes.sh are tracked (not ignored).
+# The fetched runtimes are reproduced at build time from pinned upstream URLs,
+# so they should NOT be committed. Uncomment if you vendor them locally instead:
+# assets/runtimes/

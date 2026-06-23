@@ -1,0 +1,1 @@
+Etabli Projet is a client for a self-hosted OpenProject instance. Browse tasks, filter, and assign. Consumes the OpenProject HAL+JSON API with bearer-token auth, talking only to your own server.
