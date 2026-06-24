@@ -12,7 +12,7 @@ sidebar: de
 
 1. In OpenProject einloggen.
 2. Avatar oben rechts → **Mein Konto** → **Zugriffstoken** (Access tokens).
-3. Auf **+ API-Token** klicken, einen sprechenden Namen vergeben (z.B. „Etabli Projet — Mobil") und den Token kopieren.
+3. Auf **+ API-Token** klicken, einen sprechenden Namen vergeben (z.B. „Établi Projet — Mobil") und den Token kopieren.
 4. Der Token wird nur einmal angezeigt — speichere ihn an einem sicheren Ort, bevor du das Fenster schließt.
 
 ## App einrichten

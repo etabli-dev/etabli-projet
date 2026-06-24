@@ -1,19 +1,15 @@
 ---
-title: "Etabli Projet"
+title: ""
 format:
   html:
     page-layout: full
-    toc: false
+    include-in-header:
+      text: |
+        <meta http-equiv="refresh" content="0; url=./en/index.html">
 ---
 
-<p align="center" style="margin-top:2rem;">
-  <img src="_icons/icon-projet.svg" alt="Projet" width="96">
-</p>
+```{=html}
+<script>window.location.replace("./en/index.html");</script>
+```
 
-<h2 style="text-align:center; margin:1rem 0 2rem;">Sprache wählen · Choose language · Choisir la langue</h2>
-
-<p align="center" style="font-size:1.1rem;">
-  <a href="de/">Auf Deutsch</a> ·
-  <a href="en/">In English</a> ·
-  <a href="fr/">En français</a>
-</p>
+<noscript>Loading the English documentation… if you are not redirected, [open it here](en/index.html).</noscript>

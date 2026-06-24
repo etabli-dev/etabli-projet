@@ -12,7 +12,7 @@ sidebar: fr
 
 1. Se connecter à OpenProject.
 2. Avatar en haut à droite → **Mon compte** → **Jetons d'accès**.
-3. Cliquer **+ Jeton d'API**, donner un nom parlant (p. ex. « Etabli Projet — Mobile ») et copier le jeton.
+3. Cliquer **+ Jeton d'API**, donner un nom parlant (p. ex. « Établi Projet — Mobile ») et copier le jeton.
 4. Le jeton n'est affiché qu'une seule fois — conservez-le avant de fermer la boîte de dialogue.
 
 ## Configurer l'appli

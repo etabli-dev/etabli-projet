@@ -6,7 +6,7 @@ format:
   html:
     theme:
       light: [cosmo, theme/etabli.scss]
-      dark: [cosmo, theme/etabli.scss]
+      dark: [cosmo, theme/etabli-dark.scss]
     toc: true
     toc-depth: 3
     code-copy: true
@@ -19,13 +19,15 @@ format:
       body-width: 900px
 
 website:
-  title: "Etabli Projet"
+  title: "Établi Projet"
   description: "Mobiler Client für deine eigene OpenProject-Instanz."
   reader-mode: true
   back-to-top-navigation: true
   navbar:
     pinned: true
     logo: assets/etabli-logo.svg
+    logo-href: index.html
+    title: false
     right:
       - text: "DE"
         href: de/index.qmd
@@ -38,7 +40,7 @@ website:
         href: "https://github.com/etabli-dev/etabli-projet"
   sidebar:
     - id: de
-      title: "Etabli Projet"
+      title: "Établi Projet"
       style: floating
       contents:
         - section: "Auf Deutsch"
@@ -50,7 +52,7 @@ website:
             - text: "Funktionen"
               href: de/features.qmd
     - id: en
-      title: "Etabli Projet"
+      title: "Établi Projet"
       style: floating
       contents:
         - section: "In English"
@@ -62,7 +64,7 @@ website:
             - text: "Features"
               href: en/features.qmd
     - id: fr
-      title: "Etabli Projet"
+      title: "Établi Projet"
       style: floating
       contents:
         - section: "En français"
@@ -74,7 +76,7 @@ website:
             - text: "Fonctionnalités"
               href: fr/features.qmd
   page-footer:
-    left: "Apache-2.0 · © 2026 Raban Heller"
+    left: "Apache-2.0 · © 2026 R. Heller"
     right:
       - text: "Liberapay"
         href: "https://liberapay.com/rabanheller/"

@@ -37,6 +37,8 @@ Projet est un client mobile focalisé — pas un remplaçant de l'interface web 
 
 | Canal | App |
 |-------|-----|
-| App Store (iOS) · Google Play (Android) | Etabli Projet |
-| F-Droid — dépôt principal | Etabli Projet |
+| Android (APK) — [GitHub Releases](https://github.com/etabli-dev/etabli-projet/releases) | **Version de développement** |
+| App Store (iOS) | prévu — pas encore disponible |
+| Google Play (Android) | prévu — pas encore disponible |
+| F-Droid | prévu — pas encore disponible |
 | Code source | [`etabli-dev/etabli-projet`](https://github.com/etabli-dev/etabli-projet) |

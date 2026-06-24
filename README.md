@@ -1,16 +1,19 @@
-# Etabli Projet
+# Établi Projet
 
 > Your OpenProject tasks in your pocket.
 
-`iOS` `Android` · Apache-2.0 · Part of the [Etabli Suite](https://github.com/etabli-dev)
+`iOS` `Android` · Apache-2.0 · Part of the [Établi Suite](https://github.com/etabli-dev)
 
-Etabli Projet is a client for a self-hosted OpenProject instance. Browse tasks, filter, and assign. Consumes the OpenProject HAL+JSON API with bearer-token auth, talking only to your own server.
+Établi Projet is a client for a self-hosted OpenProject instance. Browse tasks, filter, and assign. Consumes the OpenProject HAL+JSON API with bearer-token auth, talking only to your own server.
 
 ## Availability
 
-- **App Store (iOS):** available.
-- **Google Play:** available.
-- **F-Droid (main repo):** built from this repo's `/android` source.
+Établi Projet is **under active development**. There are no App Store, Google Play or F-Droid releases yet.
+
+- **Android:** install the current **development build** as a signed **APK** from **[GitHub Releases](../../releases)**.
+- **App Store (iOS):** planned — not yet available.
+- **Google Play:** planned — not yet available.
+- **F-Droid:** planned — not yet available.
 
 ## Privacy
 
@@ -30,15 +33,15 @@ Both platforms are one product, sharing the Coder Design System tokens.
 
 iOS: SwiftUI + URLSession. Android: Compose, OkHttp, DataStore
 
-**Status:** Complete. Android: move bearer token to EncryptedSharedPreferences before public release
+**Status:** In active development — not yet released. Android: move the bearer token to EncryptedSharedPreferences before any public release. Dev builds available as a signed APK via [GitHub Releases](../../releases).
 
 ## Support development
 
-- 💚 **[Liberapay](https://liberapay.com/rabanheller/)** — recurring, 0% commission, shown on F-Droid.
+- 💚 **[Liberapay](https://liberapay.com/rabanheller/)** — recurring, 0% commission, to be shown on the F-Droid listing once published.
 - ☕ [Buy Me a Coffee](https://buymeacoffee.com/rabanheller) — one-off tip (also the in-app link on iOS/Android).
 
 ## License
 
 Apache License 2.0 — see [LICENSE](LICENSE) and [NOTICE](NOTICE).
 
-Copyright 2026 Raban Heller.
+Copyright 2026 R. Heller.

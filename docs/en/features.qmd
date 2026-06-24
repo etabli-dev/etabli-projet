@@ -37,6 +37,8 @@ Projet is a focused mobile client — not a replacement for the OpenProject web 
 
 | Channel | App |
 |---------|-----|
-| App Store (iOS) · Google Play (Android) | Etabli Projet |
-| F-Droid — main repository | Etabli Projet |
+| Android (APK) — [GitHub Releases](https://github.com/etabli-dev/etabli-projet/releases) | **Development build** |
+| App Store (iOS) | planned — not yet available |
+| Google Play (Android) | planned — not yet available |
+| F-Droid | planned — not yet available |
 | Source code | [`etabli-dev/etabli-projet`](https://github.com/etabli-dev/etabli-projet) |

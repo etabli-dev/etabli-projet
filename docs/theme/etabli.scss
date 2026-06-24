@@ -1,28 +1,18 @@
 /*-- scss:defaults --*/
-// Etabli Docs Theme — abgeleitet aus _style/tokens/coder-design-system.json
-// NICHT von Hand editieren. Bei Token-Änderung neu generieren (tool/gen_docs_theme.py).
-// pkgdown-Optik, voller App-Look, Coder-Tokens 1:1.
+// Etabli Docs Theme — LIGHT. Derived from _style/tokens/coder-design-system.json
+// (accent #28A745). Do not hand-edit per app; regenerate from the central tokens.
 
-// --- Coder-Tokens als SCSS-Variablen ---
 $coder-accent:        #28A745;
 $coder-accent-dark:   #1E7E34;
 $coder-accent-light:  #48C76A;
 
-// Light
+// Light palette
 $coder-l-bg:          #FFFFFF;
 $coder-l-surface:     #F7F8FA;
 $coder-l-surface-alt: #EDEFF2;
 $coder-l-text:        #1A1C1E;
 $coder-l-text-2:      #5A5F66;
 $coder-l-border:      #D9DCE1;
-
-// Dark
-$coder-d-bg:          #121417;
-$coder-d-surface:     #1A1D21;
-$coder-d-surface-alt: #22262B;
-$coder-d-text:        #F2F4F6;
-$coder-d-text-2:      #A6ACB3;
-$coder-d-border:      #33373D;
 
 // Spacing / Radius
 $coder-sp-sm: 8px;
@@ -31,29 +21,29 @@ $coder-sp-lg: 24px;
 $coder-radius-md: 10px;
 $coder-radius-lg: 16px;
 
-// --- Bootstrap-Variablen auf Coder mappen (Default = Light) ---
-$primary:        $coder-accent;
-$body-bg:        $coder-l-bg;
-$body-color:     $coder-l-text;
-$border-color:   $coder-l-border;
-$link-color:     $coder-accent-dark;
+// Map Coder tokens onto Bootstrap (light)
+$primary:          $coder-accent;
+$body-bg:          $coder-l-bg;
+$body-color:       $coder-l-text;
+$border-color:     $coder-l-border;
+$link-color:       $coder-accent-dark;
 $link-hover-color: $coder-accent;
-$code-color:     $coder-accent-dark;
-$border-radius:        $coder-radius-md;
-$border-radius-lg:     $coder-radius-lg;
+$code-color:       $coder-accent-dark;
+$border-radius:    $coder-radius-md;
+$border-radius-lg: $coder-radius-lg;
 
-// Typografie
 $font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 $font-family-monospace:  "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
 $headings-font-weight: 600;
 
 /*-- scss:rules --*/
-// ---------- Grundlayout (pkgdown-ähnlich) ----------
 .navbar {
   background-color: $coder-accent !important;
   border-bottom: 1px solid darken($coder-accent, 8%);
   .navbar-brand, .nav-link { color: #fff !important; font-weight: 500; }
   .nav-link:hover { color: rgba(255,255,255,.82) !important; }
+  // logo-only brand: keep the mark crisp, no text gap
+  .navbar-brand img { height: 40px; }
 }
 
 code, pre { font-family: $font-family-monospace; }
@@ -68,10 +58,7 @@ pre {
   padding: .12em .38em; border-radius: $coder-radius-md;
 }
 
-// Akzent-Sidebar wie pkgdown-Reference
-.sidebar, .quarto-sidebar {
-  border-right: 1px solid $coder-l-border;
-}
+.sidebar, .quarto-sidebar { border-right: 1px solid $coder-l-border; }
 .sidebar a.active, .quarto-sidebar a.active {
   color: $coder-accent-dark; font-weight: 600;
   border-left: 3px solid $coder-accent; padding-left: calc(#{$coder-sp-md} - 3px);
@@ -88,29 +75,7 @@ h2 { border-bottom: 1px solid $coder-l-border; padding-bottom: .3em; }
 a { text-decoration: none; }
 a:hover { text-decoration: underline; }
 
-// „Badge"/Pill im App-Stil
 .etabli-badge {
   display: inline-block; background: $coder-accent; color: #fff;
   border-radius: 999px; padding: .12em .7em; font-size: .8rem; font-weight: 600;
-}
-
-// ---------- DARK MODE (voller App-Look) ----------
-// Quarto setzt data-bs-theme="dark"; wir überschreiben die Coder-Light- auf Dark-Werte.
-[data-bs-theme="dark"] {
-  --bs-body-bg: #{$coder-d-bg};
-  --bs-body-color: #{$coder-d-text};
-  --bs-border-color: #{$coder-d-border};
-
-  body { background-color: $coder-d-bg; color: $coder-d-text; }
-  pre { background-color: $coder-d-surface-alt; border-color: $coder-d-border; }
-  :not(pre) > code { background-color: $coder-d-surface-alt; color: $coder-accent-light; }
-  h1, h2, h3 { color: $coder-d-text; }
-  h2 { border-bottom-color: $coder-d-border; }
-  .sidebar, .quarto-sidebar { border-right-color: $coder-d-border; }
-  .sidebar a.active, .quarto-sidebar a.active {
-    color: $coder-accent-light; border-left-color: $coder-accent;
-  }
-  a { color: $coder-accent-light; }
-  .navbar { background-color: $coder-accent-dark !important; }
-  code { color: $coder-accent-light; }
 }

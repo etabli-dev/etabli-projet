@@ -1,5 +1,5 @@
 ---
-title: "Etabli Projet"
+title: "Établi Projet"
 sidebar: de
 ---
 
@@ -9,7 +9,7 @@ sidebar: de
 
 > Deine OpenProject-Aufgaben in der Hosentasche.
 
-Etabli Projet ist ein nativer iOS- und Android-Client für eine eigene OpenProject-Instanz. Aufgaben (Work Packages) durchblättern, filtern, einer Person zuweisen oder den Status ändern — direkt gegen den eigenen Server. Die App spricht die offizielle OpenProject-HAL+JSON-API mit Bearer-Token-Authentifizierung.
+Établi Projet ist ein nativer iOS- und Android-Client für eine eigene OpenProject-Instanz. Aufgaben (Work Packages) durchblättern, filtern, einer Person zuweisen oder den Status ändern — direkt gegen den eigenen Server. Die App spricht die offizielle OpenProject-HAL+JSON-API mit Bearer-Token-Authentifizierung.
 
 ![Projet — Anmeldemaske mit Server-URL und API-Token.](../_screens/android-login.png){width=320}
 
@@ -30,10 +30,14 @@ Keine Analyse-Tools, keine Drittanbieter-SDKs. Anmeldung erfolgt am eigenen self
 
 ## Installation
 
-| Plattform | Bezug |
-|-----------|-------|
-| iOS       | App Store |
-| Android   | Google Play und F-Droid (Haupt-Repository) |
+Établi Projet befindet sich **in aktiver Entwicklung**. Es gibt noch keine Veröffentlichung im App Store, bei Google Play oder F-Droid.
+
+| Kanal | Status |
+|-------|--------|
+| Android (APK) | **Entwicklungs-Build** über [GitHub Releases](https://github.com/etabli-dev/etabli-projet/releases) |
+| App Store (iOS) | geplant — noch nicht verfügbar |
+| Google Play | geplant — noch nicht verfügbar |
+| F-Droid | geplant — noch nicht verfügbar |
 
 Details siehe [Erste Schritte](getting-started.qmd).
 
