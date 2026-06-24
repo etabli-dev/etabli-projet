@@ -11,7 +11,7 @@ sidebar: fr
 
 Établi Projet est un client natif iOS et Android pour une instance OpenProject auto-hébergée. Parcourir les tâches (work packages), filtrer, attribuer à une personne ou changer le statut — directement contre votre serveur. L'appli parle l'API officielle HAL+JSON d'OpenProject avec authentification par jeton porteur.
 
-![Projet — écran de connexion avec URL du serveur et jeton d'API.](../_screens/android-login.png){width=320}
+![Projet — écran d'accueil avant la connexion à un serveur.](../_screens/0.1.0/01-login.png){width=320}
 
 ## À qui ça s'adresse
 

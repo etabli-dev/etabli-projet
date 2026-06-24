@@ -11,7 +11,7 @@ sidebar: en
 
 Établi Projet is a native iOS and Android client for a self-hosted OpenProject instance. Browse work packages, filter, assign to a person or update status — straight against your own server. The app speaks OpenProject's official HAL+JSON API with bearer-token authentication.
 
-![Projet — login screen with server URL and API token.](../_screens/android-login.png){width=320}
+![Projet — home screen before a server is connected.](../_screens/0.1.0/01-login.png){width=320}
 
 ## Who benefits
 

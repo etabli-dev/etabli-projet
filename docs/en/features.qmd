@@ -3,41 +3,31 @@ title: "Features"
 sidebar: en
 ---
 
-Projet is a focused mobile client — not a replacement for the OpenProject web UI. It covers the actions you need on the move.
+Projet is a lean, native client for a **self-hosted OpenProject** instance. It talks only to the server you point it at — there is no central service and no third party in between. Credentials live in the platform secure store (Android EncryptedSharedPreferences). The screenshots below are real captures of the v0.1.0 build.
 
-## Modules
+## Not connected — the starting state
 
-| Area | What it does |
-|------|--------------|
-| **Project list** | Every project visible to you. |
-| **Work-package list** | Work packages in the selected project with type, status, assignee. |
-| **Filters** | By status (open, in progress, …), assignee, type. |
-| **Detail view** | Description, responsible, priority, due date, history. |
-| **Actions** | Set status, assign, change due date. |
+When you first open the app, no OpenProject server is configured yet. The home tab uses the suite's terminal-style breadcrumb and clearly states that nothing is connected — it points you to set the server and credentials in Settings first. Nothing is fetched until you connect.
 
-## Workflows
+![Home — not connected.](../_screens/0.1.0/01-login.png){width=320}
 
-| Goal | In the app |
-|------|------------|
-| Triage your open work | Filters → "Assigned to me" + "Open" → list. |
-| Claim a task | Detail → Assignee → pick a person. |
-| Mark something done | Detail → Status → new status → confirm. |
-| Push a due date | Detail → Due date → new date → save. |
+## Settings — server & credentials
 
-## Auth & network
+**Settings** is where you enter your OpenProject instance URL and your credentials. Once connected, the app talks directly to your server over OpenProject's official HAL+JSON API (v3) with bearer-token authentication — no other host is contacted.
 
-| Aspect | Behaviour |
-|--------|-----------|
-| Auth | OAuth token in the `Authorization: Bearer …` header. |
-| Endpoint | only the configured OpenProject URL. |
-| Data format | HAL+JSON (OpenProject API v3). |
-| Other hosts | not contacted. |
+![Settings — server & credentials.](../_screens/0.1.0/02-settings.png){width=320}
+
+## Backend-dependent screens
+
+The data screens — the project list, work-package lists, detail views and the actions on them — require a **reachable OpenProject instance and valid credentials**. They are deliberately **not faked** here: they appear once you connect a server in Settings, fetching live content directly from your instance. A future capture against a test OpenProject instance will extend this page with those live data views.
 
 ## Where to get it
 
+Projet is currently an **Android-only development build** — a signed APK you install yourself.
+
 | Channel | App |
 |---------|-----|
-| Android (APK) — [GitHub Releases](https://github.com/etabli-dev/etabli-projet/releases) | **Development build** |
+| Android (signed APK) — [GitHub Releases v0.1.0](https://github.com/etabli-dev/etabli-projet/releases/tag/v0.1.0) | **Development build** |
 | App Store (iOS) | planned — not yet available |
 | Google Play (Android) | planned — not yet available |
 | F-Droid | planned — not yet available |

@@ -11,7 +11,7 @@ sidebar: de
 
 Établi Projet ist ein nativer iOS- und Android-Client für eine eigene OpenProject-Instanz. Aufgaben (Work Packages) durchblättern, filtern, einer Person zuweisen oder den Status ändern — direkt gegen den eigenen Server. Die App spricht die offizielle OpenProject-HAL+JSON-API mit Bearer-Token-Authentifizierung.
 
-![Projet — Anmeldemaske mit Server-URL und API-Token.](../_screens/android-login.png){width=320}
+![Projet — Startbildschirm, bevor ein Server verbunden ist.](../_screens/0.1.0/01-login.png){width=320}
 
 ## Wer profitiert davon
 

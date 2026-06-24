@@ -3,41 +3,31 @@ title: "Fonctionnalités"
 sidebar: fr
 ---
 
-Projet est un client mobile focalisé — pas un remplaçant de l'interface web d'OpenProject. Il couvre les actions utiles en mobilité.
+Projet est un client natif et léger pour une instance **OpenProject auto-hébergée**. Il ne communique qu'avec le serveur que vous lui indiquez — pas de service central ni de tiers entre les deux. Les identifiants résident dans le coffre-fort de la plateforme (Android EncryptedSharedPreferences). Les captures ci-dessous proviennent réellement de la version 0.1.0.
 
-## Modules
+## Non connecté — l'état de départ
 
-| Zone | Fonction |
-|------|----------|
-| **Liste des projets** | Tous les projets visibles. |
-| **Liste des work packages** | Tâches du projet choisi avec type, statut, assigné. |
-| **Filtres** | Par statut (ouvert, en cours, …), assigné, type. |
-| **Vue détail** | Description, responsable, priorité, échéance, historique. |
-| **Actions** | Définir le statut, assigner, changer l'échéance. |
+Au premier lancement, aucun serveur OpenProject n'est encore configuré. L'onglet d'accueil utilise le fil d'Ariane façon terminal de la suite et indique clairement que rien n'est connecté — il vous invite à renseigner d'abord le serveur et les identifiants dans les Réglages. Rien n'est récupéré tant que vous n'êtes pas connecté.
 
-## Flux de travail
+![Accueil — non connecté.](../_screens/0.1.0/01-login.png){width=320}
 
-| Objectif | Dans l'appli |
-|----------|--------------|
-| Trier ses tâches ouvertes | Filtres → « M'est assigné » + « Ouvert » → liste. |
-| Prendre une tâche | Détail → Assigné → choisir une personne. |
-| Marquer terminé | Détail → Statut → nouveau statut → confirmer. |
-| Repousser une échéance | Détail → Échéance → nouvelle date → enregistrer. |
+## Réglages — serveur & identifiants
 
-## Auth et réseau
+Les **Réglages** sont l'endroit où vous saisissez l'URL de votre instance OpenProject et vos identifiants. Une fois connectée, l'appli communique directement avec votre serveur via l'API officielle HAL+JSON d'OpenProject (v3) avec authentification par jeton porteur — aucun autre hôte n'est contacté.
 
-| Aspect | Comportement |
-|--------|--------------|
-| Auth | jeton OAuth dans l'en-tête `Authorization: Bearer …`. |
-| Endpoint | uniquement l'URL OpenProject configurée. |
-| Format de données | HAL+JSON (API OpenProject v3). |
-| Autres hôtes | non contactés. |
+![Réglages — serveur & identifiants.](../_screens/0.1.0/02-settings.png){width=320}
 
-## Distribution
+## Écrans dépendant du backend
+
+Les écrans de données — la liste des projets, les listes de tâches (work packages), les vues de détail et les actions associées — nécessitent une **instance OpenProject accessible et des identifiants valides**. Ils ne sont délibérément **pas simulés** ici : ils apparaissent une fois que vous avez connecté un serveur dans les Réglages, en récupérant le contenu en direct depuis votre instance. Une future capture contre une instance OpenProject de test enrichira cette page de ces vues de données réelles.
+
+## Où l'obtenir
+
+Projet est actuellement une **version de développement Android uniquement** — un APK signé que vous installez vous-même.
 
 | Canal | App |
 |-------|-----|
-| Android (APK) — [GitHub Releases](https://github.com/etabli-dev/etabli-projet/releases) | **Version de développement** |
+| Android (APK signé) — [GitHub Releases v0.1.0](https://github.com/etabli-dev/etabli-projet/releases/tag/v0.1.0) | **Version de développement** |
 | App Store (iOS) | prévu — pas encore disponible |
 | Google Play (Android) | prévu — pas encore disponible |
 | F-Droid | prévu — pas encore disponible |

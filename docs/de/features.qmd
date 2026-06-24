@@ -3,41 +3,31 @@ title: "Funktionen"
 sidebar: de
 ---
 
-Projet ist ein fokussierter Mobil-Client, kein Ersatz für die OpenProject-Web-Oberfläche. Er deckt die im Alltag mobil benötigten Aktionen ab.
+Projet ist ein schlanker, nativer Client für eine **selbst gehostete OpenProject**-Instanz. Er kommuniziert ausschließlich mit dem von Ihnen angegebenen Server — es gibt keinen zentralen Dienst und keinen Dritten dazwischen. Die Anmeldedaten liegen im Plattform-Schlüsselspeicher (Android EncryptedSharedPreferences). Die folgenden Screenshots sind echte Aufnahmen des Builds 0.1.0.
 
-## Module
+## Nicht verbunden — der Ausgangszustand
 
-| Bereich | Funktion |
-|---------|----------|
-| **Projektliste** | Alle für dich sichtbaren Projekte. |
-| **Work-Package-Liste** | Aufgaben des gewählten Projekts mit Typ, Status, Zugewiesenem. |
-| **Filter** | Nach Status (offen, in Bearbeitung, …), Zugewiesenem, Typ. |
-| **Detailansicht** | Beschreibung, Verantwortlicher, Priorität, Termin, Verlauf. |
-| **Aktionen** | Status setzen, Zuweisen, Termin ändern. |
+Beim ersten Start ist noch kein OpenProject-Server konfiguriert. Der Startbildschirm verwendet den terminalartigen Brotkrumenpfad der Suite und weist klar darauf hin, dass keine Verbindung besteht — er fordert dazu auf, zuerst Server und Anmeldedaten in den Einstellungen zu hinterlegen. Es werden keine Daten abgerufen, solange keine Verbindung besteht.
 
-## Workflows
+![Startbildschirm — nicht verbunden.](../_screens/0.1.0/01-login.png){width=320}
 
-| Ziel | Schritte in der App |
-|------|---------------------|
-| Eigene offene Aufgaben sichten | Filter → „Mir zugewiesen" + „Offen" → Liste. |
-| Eine Aufgabe übernehmen | Detail → Zugewiesener → Person wählen. |
-| Status nach Erledigung setzen | Detail → Status → neuer Status → bestätigen. |
-| Fälligkeitsdatum verschieben | Detail → Termin → neues Datum → speichern. |
+## Einstellungen — Server & Anmeldedaten
 
-## Auth & Netzwerk
+In den **Einstellungen** geben Sie die URL Ihrer OpenProject-Instanz und Ihre Anmeldedaten ein. Nach dem Verbinden kommuniziert die App direkt mit Ihrem Server über die offizielle OpenProject-HAL+JSON-API (v3) mit Bearer-Token-Authentifizierung — kein anderer Host wird kontaktiert.
 
-| Aspekt | Verhalten |
-|--------|-----------|
-| Auth | OAuth-Token im `Authorization: Bearer …`-Header. |
-| Endpunkt | ausschließlich die konfigurierte OpenProject-URL. |
-| Daten-Format | HAL+JSON (OpenProject-API v3). |
-| Sonstige Hosts | werden nicht kontaktiert. |
+![Einstellungen — Server & Anmeldedaten.](../_screens/0.1.0/02-settings.png){width=320}
+
+## Backend-abhängige Bildschirme
+
+Die Datenbildschirme — die Projektliste, die Work-Package-Listen, die Detailansichten und die zugehörigen Aktionen — setzen eine **erreichbare OpenProject-Instanz und gültige Anmeldedaten** voraus. Sie werden hier bewusst **nicht simuliert**: Sie erscheinen, sobald in den Einstellungen ein Server verbunden ist, und rufen die Inhalte live von Ihrer Instanz ab. Eine künftige Aufnahme gegen eine Test-OpenProject-Instanz wird diese Seite um diese Live-Datenansichten ergänzen.
 
 ## Bezug
 
+Projet ist derzeit ein **reiner Android-Entwicklungs-Build** — ein signiertes APK, das Sie selbst installieren.
+
 | Kanal | App |
 |-------|-----|
-| Android (APK) — [GitHub Releases](https://github.com/etabli-dev/etabli-projet/releases) | **Entwicklungs-Build** |
+| Android (signiertes APK) — [GitHub Releases v0.1.0](https://github.com/etabli-dev/etabli-projet/releases/tag/v0.1.0) | **Entwicklungs-Build** |
 | App Store (iOS) | geplant — noch nicht verfügbar |
 | Google Play (Android) | geplant — noch nicht verfügbar |
 | F-Droid | geplant — noch nicht verfügbar |
