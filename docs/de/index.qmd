@@ -43,4 +43,4 @@ Details siehe [Erste Schritte](getting-started.qmd).
 
 ## Unterstützen
 
-Wenn dir die App nützt: [Liberapay](https://liberapay.com/rabanheller/) · in der App selbst findest du außerdem einen Buy-Me-a-Coffee-Link.
+Wenn dir die App nützt: [Liberapay](https://liberapay.com/rabanheller/).

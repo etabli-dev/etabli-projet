@@ -38,7 +38,6 @@ iOS: SwiftUI + URLSession. Android: Compose, OkHttp, DataStore
 ## Support development
 
 - 💚 **[Liberapay](https://liberapay.com/rabanheller/)** — recurring, 0% commission, to be shown on the F-Droid listing once published.
-- ☕ [Buy Me a Coffee](https://buymeacoffee.com/rabanheller) — one-off tip (also the in-app link on iOS/Android).
 
 ## License
 

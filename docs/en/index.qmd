@@ -43,4 +43,4 @@ Details: see [Getting Started](getting-started.qmd).
 
 ## Support
 
-If you find the app useful: [Liberapay](https://liberapay.com/rabanheller/) · inside the app you will also find a Buy-Me-a-Coffee link.
+If you find the app useful: [Liberapay](https://liberapay.com/rabanheller/).
