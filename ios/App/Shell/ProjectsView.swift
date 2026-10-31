@@ -7,6 +7,7 @@ struct ProjectsView: View {
     @Environment(OPClient.self) private var client
     @State private var projects: [OPProject] = []
     @State private var loading = false
+    @State private var loadRequest = UUID()
     @State private var error: String?
 
     var body: some View {
@@ -15,7 +16,7 @@ struct ProjectsView: View {
             content
         }
         .toolbar(.hidden, for: .navigationBar)
-        .task { await load() }
+        .task(id: client.config) { await load() }
         .refreshable { await load() }
     }
 
@@ -62,11 +63,21 @@ struct ProjectsView: View {
     }
 
     private func load() async {
-        guard client.config != nil else { return }
-        loading = true; error = nil
-        do { projects = try await client.listProjects() }
-        catch { self.error = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription }
-        loading = false
+        let request = UUID(); loadRequest = request
+        let account = client.config
+        guard account != nil else { projects = []; loading = false; return }
+        loading = true; error = nil; projects = []
+        defer { if loadRequest == request { loading = false } }
+        do {
+            let loaded = try await client.listProjects()
+            try Task.checkCancellation()
+            guard loadRequest == request && client.config == account else { return }
+            projects = loaded
+        } catch is CancellationError { }
+        catch {
+            guard loadRequest == request && client.config == account else { return }
+            self.error = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+        }
     }
 }
 
@@ -75,6 +86,7 @@ struct ProjectWorkPackagesView: View {
     @Environment(OPClient.self) private var client
     @State private var workPackages: [OPWorkPackage] = []
     @State private var loading = false
+    @State private var loadRequest = UUID()
     @State private var error: String?
     @State private var query = ""
     @State private var selected: OPWorkPackage?
@@ -85,7 +97,7 @@ struct ProjectWorkPackagesView: View {
             content
         }
         .navigationBarTitleDisplayMode(.inline)
-        .task { await load() }
+        .task(id: client.config) { await load() }
         .refreshable { await load() }
         .sheet(item: $selected) { wp in
             WorkPackageDetailView(workPackage: wp) { updated in
@@ -152,15 +164,20 @@ struct ProjectWorkPackagesView: View {
     }
 
     private func load() async {
-        loading = true; error = nil
+        let request = UUID(); loadRequest = request
+        let account = client.config
+        guard account != nil else { workPackages = []; loading = false; return }
+        loading = true; error = nil; workPackages = []
+        defer { if loadRequest == request { loading = false } }
         do {
-            let page = try await client.listWorkPackages(projectID: project.id,
-                                                         query: query.isEmpty ? nil : query,
-                                                         pageSize: 100)
-            workPackages = page.workPackages
-        } catch {
+            let loaded = try await client.listWorkPackages(projectID: project.id, query: query.isEmpty ? nil : query, pageSize: 100).workPackages
+            try Task.checkCancellation()
+            guard loadRequest == request && client.config == account else { return }
+            workPackages = loaded
+        } catch is CancellationError { }
+        catch {
+            guard loadRequest == request && client.config == account else { return }
             self.error = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
         }
-        loading = false
     }
 }

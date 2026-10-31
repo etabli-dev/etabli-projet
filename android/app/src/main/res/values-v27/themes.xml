@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.EtabliProjet" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/coder_paper</item>
+        <item name="android:navigationBarColor">@color/coder_paper</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:windowBackground">@color/coder_paper</item>
+    </style>
+</resources>

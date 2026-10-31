@@ -3,32 +3,14 @@ title: "Features"
 sidebar: en
 ---
 
-Projet is a lean, native client for a **self-hosted OpenProject** instance. It talks only to the server you point it at — there is no central service and no third party in between. Credentials live in the platform secure store (Android EncryptedSharedPreferences). The screenshots below are real captures of the v0.1.0 build.
+Browse OpenProject projects and work packages using your own server account. Creation, editing and full pagination are deferred.
 
-## Not connected — the starting state
+This page describes the October 2026 source revision. These changes are unpublished and are not part of older development releases. Local checks are distinct from device, live-service and store acceptance.
 
-When you first open the app, no OpenProject server is configured yet. The home tab uses the suite's terminal-style breadcrumb and clearly states that nothing is connected — it points you to set the server and credentials in Settings first. Nothing is fetched until you connect.
+[Current status / Aktueller Stand / État actuel](../current-status.qmd)
+
+Historical screenshots from v0.1.0; these are not verification of the current revision.
 
 ![Home — not connected.](../_screens/0.1.0/01-login.png){width=320}
 
-## Settings — server & credentials
-
-**Settings** is where you enter your OpenProject instance URL and your credentials. Once connected, the app talks directly to your server over OpenProject's official HAL+JSON API (v3) with bearer-token authentication — no other host is contacted.
-
 ![Settings — server & credentials.](../_screens/0.1.0/02-settings.png){width=320}
-
-## Backend-dependent screens
-
-The data screens — the project list, work-package lists, detail views and the actions on them — require a **reachable OpenProject instance and valid credentials**. They are deliberately **not faked** here: they appear once you connect a server in Settings, fetching live content directly from your instance. A future capture against a test OpenProject instance will extend this page with those live data views.
-
-## Where to get it
-
-Projet is currently an **Android-only development build** — a signed APK you install yourself.
-
-| Channel | App |
-|---------|-----|
-| Android (signed APK) — [GitHub Releases v0.1.0](https://github.com/etabli-dev/etabli-projet/releases/tag/v0.1.0) | **Development build** |
-| App Store (iOS) | planned — not yet available |
-| Google Play (Android) | planned — not yet available |
-| F-Droid | planned — not yet available |
-| Source code | [`etabli-dev/etabli-projet`](https://github.com/etabli-dev/etabli-projet) |

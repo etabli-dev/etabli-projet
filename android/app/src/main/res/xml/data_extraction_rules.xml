@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Auto-backup config — keep everything in the default backup set.
-  No PII; nothing to exclude.
+  Credentials are device-bound. Reconnect after restoring on another device.
 -->
 <data-extraction-rules>
     <cloud-backup>
-        <include domain="root" />
+        <exclude domain="file" path="datastore/op_config.preferences_pb" />
     </cloud-backup>
     <device-transfer>
-        <include domain="root" />
+        <exclude domain="file" path="datastore/op_config.preferences_pb" />
     </device-transfer>
 </data-extraction-rules>

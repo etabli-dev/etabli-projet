@@ -3,44 +3,10 @@ title: "Établi Projet"
 sidebar: en
 ---
 
-<img src="../_icons/icon-projet.svg" alt="" width="80" align="right" style="margin:0 0 1rem 1rem;">
+Browse OpenProject projects and work packages using your own server account. Creation, editing and full pagination are deferred.
 
-<span class="etabli-badge">Self-hosted client</span>
+This page describes the October 2026 source revision. These source changes are not part of older development release downloads. Local checks are distinct from device, live-service and store acceptance.
 
-> Your OpenProject work packages in your pocket.
+[Current implementation, prerequisites and commands](../current-status.qmd)
 
-Établi Projet is a native iOS and Android client for a self-hosted OpenProject instance. Browse work packages, filter, assign to a person or update status — straight against your own server. The app speaks OpenProject's official HAL+JSON API with bearer-token authentication.
-
-![Projet — home screen before a server is connected.](../_screens/0.1.0/01-login.png){width=320}
-
-## Who benefits
-
-Teams self-hosting OpenProject, and individuals who, on the move, need to update a status, claim a task, or look up an upcoming due date.
-
-## Platforms
-
-| Platform | Status |
-|----------|--------|
-| iOS      | ✓      |
-| Android  | ✓      |
-
-## Privacy
-
-No analytics, no third-party SDKs. Sign-in happens on your self-hosted OpenProject server. Credentials (URL + API token) live only in the platform secure store (iOS Keychain · Android EncryptedSharedPreferences) and only go to the configured instance.
-
-## Installation
-
-Établi Projet is **under active development**. There are no App Store, Google Play or F-Droid releases yet.
-
-| Channel | Status |
-|---------|--------|
-| Android (APK) | **Development build** via [GitHub Releases](https://github.com/etabli-dev/etabli-projet/releases) |
-| App Store (iOS) | planned — not yet available |
-| Google Play | planned — not yet available |
-| F-Droid | planned — not yet available |
-
-Details: see [Getting Started](getting-started.qmd).
-
-## Support
-
-If you find the app useful: [Liberapay](https://liberapay.com/rabanheller/).
+[README](https://github.com/etabli-dev/etabli-projet/blob/main/README.md) · [GitHub](https://github.com/etabli-dev/etabli-projet)

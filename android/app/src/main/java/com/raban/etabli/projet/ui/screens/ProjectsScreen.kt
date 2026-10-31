@@ -17,6 +17,8 @@ import com.raban.etabli.projet.EtabliProjetApplication
 import com.raban.etabli.projet.net.OPProject
 import com.raban.etabli.projet.ui.theme.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.CancellationException
 
 @Composable
 fun ProjectsScreen(app: EtabliProjetApplication) {
@@ -26,14 +28,20 @@ fun ProjectsScreen(app: EtabliProjetApplication) {
     var items by remember { mutableStateOf<List<OPProject>?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
     var loading by remember { mutableStateOf(false) }
+    var loadJob by remember { mutableStateOf<Job?>(null) }
+    var generation by remember { mutableLongStateOf(0L) }
+    DisposableEffect(Unit) { onDispose { loadJob?.cancel() } }
 
     fun load() {
-        if (config == null) { items = null; error = null; return }
-        scope.launch {
+        val request = ++generation
+        loadJob?.cancel()
+        if (config == null) { items = null; error = null; loading = false; return }
+        loadJob = scope.launch {
             loading = true; error = null
             try { items = app.client.listProjects() }
-            catch (e: Throwable) { error = e.message ?: "Failed"; items = null }
-            finally { loading = false }
+            catch (e: CancellationException) { throw e }
+            catch (e: Exception) { error = e.message ?: "Failed"; items = null }
+            finally { if (generation == request) loading = false }
         }
     }
 
@@ -52,7 +60,7 @@ fun ProjectsScreen(app: EtabliProjetApplication) {
             error != null     -> ErrorState("Couldn't load projects", detail = error, onRetry = ::load)
             items == null     -> Spacer(Modifier.size(0.dp))
             items!!.isEmpty() -> EmptyState("No projects.")
-            else              -> LazyColumn(verticalArrangement = Arrangement.spacedBy(t.space.sm)) {
+            else              -> LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(t.space.sm)) {
                 items(items!!, key = { it.id }) { p ->
                     Card(title = p.name, icon = Icons.Default.Folder) {
                         MonoLabel("id ${p.id} · ${p.identifier ?: "—"}", color = t.color.faint)

@@ -19,6 +19,7 @@ import com.raban.etabli.projet.EtabliProjetApplication
 import com.raban.etabli.projet.net.OPMe
 import com.raban.etabli.projet.ui.theme.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
 
 @Composable
 fun SettingsScreen(app: EtabliProjetApplication) {
@@ -55,12 +56,11 @@ fun SettingsScreen(app: EtabliProjetApplication) {
                 scope.launch {
                     busy = true; status = null; me = null
                     try {
-                        app.client.configure(url.trim(), token.trim())
-                        me = app.client.testConnection()
+                        me = app.client.configure(url.trim(), token.trim())
                         status = "Connected as ${me!!.name}"
                         statusTone = StatusTone.Accent
                         token = ""
-                    } catch (e: Throwable) {
+                    } catch (e: CancellationException) { throw e } catch (e: Exception) {
                         status = e.message ?: "Failed"
                         statusTone = StatusTone.Danger
                     } finally { busy = false }
@@ -69,7 +69,9 @@ fun SettingsScreen(app: EtabliProjetApplication) {
             if (current != null) {
                 PrimaryButton("Disconnect", icon = Icons.AutoMirrored.Filled.Logout) {
                     scope.launch {
-                        app.client.disconnect()
+                        try { app.client.disconnect() }
+                        catch (e: CancellationException) { throw e }
+                        catch (e: Exception) { status = "Could not disconnect: ${e.message}"; statusTone = StatusTone.Danger; return@launch }
                         status = "Disconnected"
                         statusTone = StatusTone.Info
                         me = null

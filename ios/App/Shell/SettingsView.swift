@@ -135,8 +135,7 @@ struct SettingsView: View {
         testing = true; testError = nil; testResult = nil
         Task {
             do {
-                try client.configure(baseURL: url, token: token.trimmingCharacters(in: .whitespaces))
-                let me = try await client.testConnection()
+                let me = try await client.configure(baseURL: url, token: token.trimmingCharacters(in: .whitespaces))
                 testResult = "Signed in as \(me.name ?? "user \(me.id)")"
             } catch {
                 testError = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription

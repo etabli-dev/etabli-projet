@@ -6,7 +6,7 @@ package com.raban.etabli.projet.net
 import org.json.JSONObject
 
 // HAL+JSON parsing helpers.
-// Only the fields we surface in the UI are decoded — keeps spec drift quiet.
+// Require identity/display fields; additional HAL fields remain forward compatible.
 
 private fun JSONObject.linkTitle(name: String): String? =
     optJSONObject("_links")?.optJSONObject(name)?.optString("title")?.ifBlank { null }
@@ -14,8 +14,8 @@ private fun JSONObject.linkTitle(name: String): String? =
 data class OPMe(val id: Int, val name: String, val email: String?) {
     companion object {
         fun parse(o: JSONObject) = OPMe(
-            id = o.optInt("id"),
-            name = o.optString("name"),
+            id = o.getInt("id").also { require(it > 0) { "Invalid object ID" } },
+            name = o.getString("name"),
             email = o.optString("email").ifBlank { null },
         )
     }
@@ -29,9 +29,9 @@ data class OPProject(
 ) {
     companion object {
         fun parse(o: JSONObject) = OPProject(
-            id = o.optInt("id"),
+            id = o.getInt("id").also { require(it > 0) { "Invalid object ID" } },
             identifier = o.optString("identifier").ifBlank { null },
-            name = o.optString("name"),
+            name = o.getString("name"),
             description = o.optJSONObject("description")?.optString("raw")?.ifBlank { null },
         )
     }
@@ -48,8 +48,8 @@ data class OPWorkPackage(
 ) {
     companion object {
         fun parse(o: JSONObject) = OPWorkPackage(
-            id = o.optInt("id"),
-            subject = o.optString("subject"),
+            id = o.getInt("id").also { require(it > 0) { "Invalid object ID" } },
+            subject = o.getString("subject"),
             statusTitle = o.linkTitle("status"),
             typeTitle = o.linkTitle("type"),
             priorityTitle = o.linkTitle("priority"),

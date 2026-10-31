@@ -46,19 +46,28 @@ public final class OPClient {
 
     public private(set) var config: OPConfig?
 
-    private let session: URLSession
+    private let session: ClientHTTP
+    private let defaults: UserDefaults
+    private var connectionIntent = UUID()
     private let decoder: JSONDecoder
     private let keychainService = "projectviewer.openproject"
     private let urlKey = "projectviewer.openproject.baseurl"
 
-    public init(session: URLSession = .shared) {
-        self.session = session
+    public init(session: URLSession = .shared, defaults: UserDefaults = .standard) {
+        self.session = ClientHTTP(configuration: session.configuration)
+        self.defaults = defaults
         self.decoder = JSONDecoder()
 
         // Restore the (URL, has-token) pair on launch. Token stays in
         // Keychain; the URL is non-secret config. `Keychain.get` returns
         // `String?`, and `try?` wraps that, so we flatten with `?? nil`.
-        if let stored = UserDefaults.standard.url(forKey: urlKey),
+        if let saved = (try? Keychain.get(service: keychainService, account: "connection.v2")) ?? nil {
+            guard let value = try? JSONDecoder().decode(StoredConnection.self, from: Data(saved.utf8)),
+                  (try? secureServer(value.server)) != nil, !value.token.isEmpty else { return }
+            self.config = OPConfig(baseURL: value.server, hasToken: true)
+            return
+        }
+        if let stored = defaults.url(forKey: urlKey), (try? secureServer(stored)) != nil,
            let token = (try? Keychain.get(service: keychainService, account: "token")) ?? nil,
            !token.isEmpty {
             self.config = OPConfig(baseURL: stored, hasToken: true)
@@ -67,19 +76,39 @@ public final class OPClient {
 
     // MARK: - Setup
 
-    public func configure(baseURL: URL, token: String) throws {
-        UserDefaults.standard.set(baseURL, forKey: urlKey)
-        try Keychain.set(token, service: keychainService, account: "token")
+    @discardableResult
+    public func configure(baseURL: URL, token: String) async throws -> OPMe {
+        let intent = UUID(); connectionIntent = intent
+        let baseURL = try secureServer(baseURL)
+        guard !token.isEmpty else { throw OPError.notConfigured }
+        var request = URLRequest(url: baseURL.appendingPathComponent("api/v3/users/me"))
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/hal+json", forHTTPHeaderField: "Accept")
+        let (data, response) = try await session.data(for: request)
+        try Self.checkResponse(response, data: data)
+        let me = try decoder.decode(OPMe.self, from: data)
+        guard connectionIntent == intent else { throw CancellationError() }
+        let saved = try JSONEncoder().encode(StoredConnection(server: baseURL, token: token))
+        try Keychain.set(String(decoding: saved, as: UTF8.self), service: keychainService, account: "connection.v2")
+        defaults.set(baseURL, forKey: urlKey)
         config = OPConfig(baseURL: baseURL, hasToken: true)
+        return me
     }
 
     public func disconnect() throws {
+        connectionIntent = UUID()
         try Keychain.delete(service: keychainService, account: "token")
-        UserDefaults.standard.removeObject(forKey: urlKey)
+        try Keychain.delete(service: keychainService, account: "connection.v2")
+        defaults.removeObject(forKey: urlKey)
         config = nil
     }
 
     private func token() throws -> String {
+        if let saved = try Keychain.get(service: keychainService, account: "connection.v2") {
+            let value = try JSONDecoder().decode(StoredConnection.self, from: Data(saved.utf8))
+            guard value.server == config?.baseURL else { throw OPError.notConfigured }
+            return value.token
+        }
         guard let t = try Keychain.get(service: keychainService, account: "token"), !t.isEmpty
         else { throw OPError.notConfigured }
         return t
@@ -186,7 +215,8 @@ public final class OPClient {
             try Self.checkResponse(response, data: data)
             do { return try decoder.decode(T.self, from: data) }
             catch { throw OPError.decoding(error.localizedDescription) }
-        } catch let e as OPError { throw e }
+        } catch is CancellationError { throw CancellationError() }
+        catch let e as OPError { throw e }
         catch { throw OPError.transport(error.localizedDescription) }
     }
 
@@ -201,12 +231,13 @@ public final class OPClient {
             try Self.checkResponse(response, data: respData)
             do { return try decoder.decode(T.self, from: respData) }
             catch { throw OPError.decoding(error.localizedDescription) }
-        } catch let e as OPError { throw e }
+        } catch is CancellationError { throw CancellationError() }
+        catch let e as OPError { throw e }
         catch { throw OPError.transport(error.localizedDescription) }
     }
 
     private static func checkResponse(_ response: URLResponse, data: Data) throws {
-        guard let http = response as? HTTPURLResponse else { return }
+        guard let http = response as? HTTPURLResponse else { throw OPError.transport("No HTTP response") }
         guard (200..<300).contains(http.statusCode) else {
             throw OPError.http(status: http.statusCode,
                                body: String(data: data, encoding: .utf8))

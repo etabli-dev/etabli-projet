@@ -31,7 +31,7 @@ public struct HALCollection<T: Decodable & Sendable>: Decodable, Sendable {
     public let total: Int?
     public let pageSize: Int?
     public let offset: Int?
-    public let _embedded: Embedded?
+    public let _embedded: Embedded
     public let _links: Links?
 
     public struct Embedded: Decodable, Sendable { public let elements: [T] }
@@ -40,7 +40,7 @@ public struct HALCollection<T: Decodable & Sendable>: Decodable, Sendable {
         public let prevByOffset: HALLink?
     }
 
-    public var elements: [T] { _embedded?.elements ?? [] }
+    public var elements: [T] { _embedded.elements }
 }
 
 // MARK: - Endpoint resources (only the fields we surface)

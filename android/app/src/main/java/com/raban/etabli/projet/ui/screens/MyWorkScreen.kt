@@ -17,6 +17,8 @@ import com.raban.etabli.projet.EtabliProjetApplication
 import com.raban.etabli.projet.net.OPWorkPackage
 import com.raban.etabli.projet.ui.theme.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.CancellationException
 
 @Composable
 fun MyWorkScreen(app: EtabliProjetApplication) {
@@ -26,14 +28,20 @@ fun MyWorkScreen(app: EtabliProjetApplication) {
     var items by remember { mutableStateOf<List<OPWorkPackage>?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
     var loading by remember { mutableStateOf(false) }
+    var loadJob by remember { mutableStateOf<Job?>(null) }
+    var generation by remember { mutableLongStateOf(0L) }
+    DisposableEffect(Unit) { onDispose { loadJob?.cancel() } }
 
     fun load() {
-        if (config == null) { items = null; error = null; return }
-        scope.launch {
+        val request = ++generation
+        loadJob?.cancel()
+        if (config == null) { items = null; error = null; loading = false; return }
+        loadJob = scope.launch {
             loading = true; error = null
             try { items = app.client.listMyWorkPackages() }
-            catch (e: Throwable) { error = e.message; items = null }
-            finally { loading = false }
+            catch (e: CancellationException) { throw e }
+            catch (e: Exception) { error = e.message; items = null }
+            finally { if (generation == request) loading = false }
         }
     }
     LaunchedEffect(config) { load() }
@@ -51,7 +59,7 @@ fun MyWorkScreen(app: EtabliProjetApplication) {
             error != null     -> ErrorState("Couldn't load", detail = error, onRetry = ::load)
             items == null     -> Spacer(Modifier.size(0.dp))
             items!!.isEmpty() -> EmptyState("Nothing assigned to you.")
-            else              -> LazyColumn(verticalArrangement = Arrangement.spacedBy(t.space.sm)) {
+            else              -> LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(t.space.sm)) {
                 items(items!!, key = { it.id }) { wp ->
                     Card(title = "#${wp.id}  ${wp.subject}", icon = Icons.AutoMirrored.Filled.Assignment) {
                         wp.projectTitle?.let { MonoLabel("project · $it", color = t.color.faint) }

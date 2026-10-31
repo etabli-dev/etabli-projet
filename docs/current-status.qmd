@@ -1,0 +1,23 @@
+---
+title: "Current implementation and first use"
+---
+
+Browse OpenProject projects and work packages using your own server account. Creation, editing and full pagination are deferred.
+
+This page describes the October 2026 source revision. These source changes are not part of older development release downloads. Local checks are distinct from device, live-service and store acceptance.
+
+## Build from a clean checkout
+
+JDK 17, Android SDK 36 and build-tools 35.0.0. Set JAVA_HOME and ANDROID_HOME. A device/emulator is required to install. Open the existing ios/*.xcodeproj in a full Xcode installation for iOS.
+
+```sh
+cd android
+./gradlew --no-daemon testDebugUnitTest lintDebug assembleDebug bundleRelease
+adb install -r app/build/outputs/apk/debug/app-debug.apk
+```
+
+These commands build from this source tree. Debug APKs are development artifacts; release bundles need private signing and device acceptance. A successful build is not a store submission.
+
+## Use and verification
+
+Read the [repository README](https://github.com/etabli-dev/etabli-projet/blob/main/README.md) for the exact application workflow, privacy/storage behavior and platform differences. The [October refinement record](https://github.com/etabli-dev/etabli-projet/blob/main/docs/refinement-2026-10.md) records findings, changes, observed checks, deferred work and the next release action. See the workflow runs for the exact source commit; local verification does not establish a remote CI result.

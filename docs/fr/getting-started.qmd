@@ -3,30 +3,10 @@ title: "Premiers pas"
 sidebar: fr
 ---
 
-## Prérequis
+Consulter les projets et lots de travaux OpenProject avec votre compte serveur. La création, la modification et la pagination complète restent à développer.
 
-- Une instance OpenProject auto-hébergée et accessible (HTTPS recommandé).
-- Un jeton d'API pour votre utilisateur (voir ci-dessous).
+Cette page décrit les sources d’octobre 2026. Ces modifications ne sont pas publiées et ne figurent pas dans les anciennes versions de développement. Les contrôles locaux ne remplacent pas la validation sur appareil, serveur réel ou boutique.
 
-## Créer un jeton d'API dans OpenProject
+[Fonctions actuelles, prérequis et commandes (en anglais)](../current-status.qmd)
 
-1. Se connecter à OpenProject.
-2. Avatar en haut à droite → **Mon compte** → **Jetons d'accès**.
-3. Cliquer **+ Jeton d'API**, donner un nom parlant (p. ex. « Établi Projet — Mobile ») et copier le jeton.
-4. Le jeton n'est affiché qu'une seule fois — conservez-le avant de fermer la boîte de dialogue.
-
-## Configurer l'appli
-
-1. Installer l'appli depuis le store et l'ouvrir.
-2. Dans l'écran de configuration, saisir :
-   - **URL du serveur** (p. ex. `https://op.example.org`)
-   - **Jeton d'API** issu de l'étape précédente
-3. À la connexion réussie, l'appli charge les listes de projets et de work packages.
-
-![Écran de configuration avec champs pour l'URL du serveur et le jeton d'API.](../_screens/android-login.png){width=320}
-
-## Remarques
-
-- Les permissions reflètent exactement votre compte OpenProject. Ce que vous voyez dans l'interface web, vous le voyez dans l'appli ; ce qui vous y manque, manque aussi ici.
-- Les identifiants restent dans le coffre-fort de l'appareil.
-- L'appli utilise l'API HAL+JSON d'OpenProject ; certains champs personnalisés peu utilisés peuvent ne pas être pleinement rendus dans la vue détail mobile.
+[README](https://github.com/etabli-dev/etabli-projet/blob/main/README.md) · [GitHub](https://github.com/etabli-dev/etabli-projet)

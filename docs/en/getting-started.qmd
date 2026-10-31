@@ -1,32 +1,12 @@
 ---
-title: "Getting Started"
+title: "Getting started"
 sidebar: en
 ---
 
-## Requirements
+Browse OpenProject projects and work packages using your own server account. Creation, editing and full pagination are deferred.
 
-- A self-hosted, reachable OpenProject instance (HTTPS recommended).
-- An API token for your user (see below).
+This page describes the October 2026 source revision. These source changes are not part of older development release downloads. Local checks are distinct from device, live-service and store acceptance.
 
-## Create an API token in OpenProject
+[Current implementation, prerequisites and commands](../current-status.qmd)
 
-1. Sign in to OpenProject.
-2. Avatar in the top right → **My Account** → **Access tokens**.
-3. Click **+ API token**, give it a descriptive name (e.g. "Établi Projet — Mobile") and copy the token.
-4. The token is shown only once — store it somewhere safe before closing the dialog.
-
-## Configure the app
-
-1. Install the app from the store and open it.
-2. In the setup dialog, enter:
-   - **Server URL** (e.g. `https://op.example.org`)
-   - **API Token** from the step above
-3. On successful connection, the app loads project and work-package lists.
-
-![Setup screen with fields for server URL and API token.](../_screens/android-login.png){width=320}
-
-## Notes
-
-- Permissions exactly mirror your OpenProject account. What you see in the web UI, you see in the app; what's missing there is also missing here.
-- Credentials remain in the platform secure store.
-- The app uses OpenProject's HAL+JSON API; rarely-used custom fields may not be fully rendered in the mobile detail view.
+[README](https://github.com/etabli-dev/etabli-projet/blob/main/README.md) · [GitHub](https://github.com/etabli-dev/etabli-projet)

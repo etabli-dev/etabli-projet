@@ -3,32 +3,14 @@ title: "Funktionen"
 sidebar: de
 ---
 
-Projet ist ein schlanker, nativer Client für eine **selbst gehostete OpenProject**-Instanz. Er kommuniziert ausschließlich mit dem von Ihnen angegebenen Server — es gibt keinen zentralen Dienst und keinen Dritten dazwischen. Die Anmeldedaten liegen im Plattform-Schlüsselspeicher (Android EncryptedSharedPreferences). Die folgenden Screenshots sind echte Aufnahmen des Builds 0.1.0.
+OpenProject-Projekte und Arbeitspakete mit dem eigenen Serverkonto durchsuchen. Erstellen, Bearbeiten und vollständige Seitennavigation sind noch nicht umgesetzt.
 
-## Nicht verbunden — der Ausgangszustand
+Diese Seite beschreibt den Quellstand vom Oktober 2026. Die Änderungen sind unveröffentlicht und nicht Teil älterer Entwicklungsreleases. Lokale Prüfungen ersetzen keine Geräte-, Live-Server- oder Store-Abnahme.
 
-Beim ersten Start ist noch kein OpenProject-Server konfiguriert. Der Startbildschirm verwendet den terminalartigen Brotkrumenpfad der Suite und weist klar darauf hin, dass keine Verbindung besteht — er fordert dazu auf, zuerst Server und Anmeldedaten in den Einstellungen zu hinterlegen. Es werden keine Daten abgerufen, solange keine Verbindung besteht.
+[Current status / Aktueller Stand / État actuel](../current-status.qmd)
+
+Historische Bildschirmfotos aus v0.1.0; sie belegen keine Prüfung des aktuellen Quellstands.
 
 ![Startbildschirm — nicht verbunden.](../_screens/0.1.0/01-login.png){width=320}
 
-## Einstellungen — Server & Anmeldedaten
-
-In den **Einstellungen** geben Sie die URL Ihrer OpenProject-Instanz und Ihre Anmeldedaten ein. Nach dem Verbinden kommuniziert die App direkt mit Ihrem Server über die offizielle OpenProject-HAL+JSON-API (v3) mit Bearer-Token-Authentifizierung — kein anderer Host wird kontaktiert.
-
 ![Einstellungen — Server & Anmeldedaten.](../_screens/0.1.0/02-settings.png){width=320}
-
-## Backend-abhängige Bildschirme
-
-Die Datenbildschirme — die Projektliste, die Work-Package-Listen, die Detailansichten und die zugehörigen Aktionen — setzen eine **erreichbare OpenProject-Instanz und gültige Anmeldedaten** voraus. Sie werden hier bewusst **nicht simuliert**: Sie erscheinen, sobald in den Einstellungen ein Server verbunden ist, und rufen die Inhalte live von Ihrer Instanz ab. Eine künftige Aufnahme gegen eine Test-OpenProject-Instanz wird diese Seite um diese Live-Datenansichten ergänzen.
-
-## Bezug
-
-Projet ist derzeit ein **reiner Android-Entwicklungs-Build** — ein signiertes APK, das Sie selbst installieren.
-
-| Kanal | App |
-|-------|-----|
-| Android (signiertes APK) — [GitHub Releases v0.1.0](https://github.com/etabli-dev/etabli-projet/releases/tag/v0.1.0) | **Entwicklungs-Build** |
-| App Store (iOS) | geplant — noch nicht verfügbar |
-| Google Play (Android) | geplant — noch nicht verfügbar |
-| F-Droid | geplant — noch nicht verfügbar |
-| Quellcode | [`etabli-dev/etabli-projet`](https://github.com/etabli-dev/etabli-projet) |

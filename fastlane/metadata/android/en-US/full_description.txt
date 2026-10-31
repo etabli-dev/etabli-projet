@@ -1,1 +1,3 @@
-Etabli Projet is a client for a self-hosted OpenProject instance. Browse tasks, filter, and assign. Consumes the OpenProject HAL+JSON API with bearer-token auth, talking only to your own server.
+Établi Projet lists projects and work packages assigned to you in OpenProject. This Android version is read-only; subject editing and assignment changes are not available. Screens show up to 200 projects and 100 assigned work packages.
+
+Connect using your HTTPS server and API token. The token is encrypted with Android Keystore. No analytics or author-operated service.
