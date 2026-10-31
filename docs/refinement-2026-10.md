@@ -1,5 +1,9 @@
 # October 2026 refinement
 
+## First published CI run and follow-up
+
+On 2026-10-31, the [first published verification run](https://github.com/etabli-dev/etabli-projet/actions/runs/41200110679) failed in the Android SDK installation step with `sdkmanager: command not found` (exit 127), before Android tests, lint or packaging ran. The workflow now explicitly installs Android command-line tools using `android-actions/setup-android` v4.0.4, pinned to its verified commit, before requesting API 36 and build-tools 35.0.0. Existing checks and artifact collection remain intact. YAML and the action reference were checked locally; the follow-up remote Android result is pending. Earlier local build and device evidence below remains separate from this failed remote run.
+
 ## Scope and acceptance
 
 Harden the existing self-hosted client without changing server APIs or deleting user configuration. Required gates: reproducible Android unit tests, lint and APK build; secure credential migration; explicit network failures; accurate setup and platform status. iOS and live-server acceptance are separate gates.
