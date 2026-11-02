@@ -6,9 +6,8 @@ import Observation
 
 // OpenProject HTTP client.
 //
-// Auth: a single long-lived API token sent as `Authorization: Bearer <token>`.
-// (OpenProject also accepts Basic with username "apikey" + token as password;
-// Bearer is simpler and what the docs recommend for personal API access.)
+// Negotiate API-token authentication on the safe connection GET: Bearer first,
+// then Basic with username "apikey" only after 401. Ordinary requests never retry.
 //
 // Spec verification:
 //   - openproject.org/docs/api      → human spec
@@ -81,14 +80,33 @@ public final class OPClient {
         let intent = UUID(); connectionIntent = intent
         let baseURL = try secureServer(baseURL)
         guard !token.isEmpty else { throw OPError.notConfigured }
-        var request = URLRequest(url: baseURL.appendingPathComponent("api/v3/users/me"))
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/hal+json", forHTTPHeaderField: "Accept")
-        let (data, response) = try await session.data(for: request)
-        try Self.checkResponse(response, data: data)
-        let me = try decoder.decode(OPMe.self, from: data)
+        let deadline = ProcessInfo.processInfo.systemUptime + 45
+        func verify(_ authentication: OPAuthentication) async throws -> OPMe {
+            try Task.checkCancellation()
+            guard connectionIntent == intent else { throw CancellationError() }
+            let remaining = deadline - ProcessInfo.processInfo.systemUptime
+            guard remaining > 0 else { throw URLError(.timedOut) }
+            var request = URLRequest(url: baseURL.appendingPathComponent("api/v3/users/me"))
+            request.timeoutInterval = remaining
+            request.setValue(authentication.authorization(token), forHTTPHeaderField: "Authorization")
+            request.setValue("application/hal+json", forHTTPHeaderField: "Accept")
+            let (data, response) = try await session.data(for: request)
+            try Self.checkResponse(response, data: data)
+            return try decoder.decode(OPMe.self, from: data)
+        }
+        let me: OPMe
+        let authentication: OPAuthentication
+        do {
+            me = try await verify(.bearer)
+            authentication = .bearer
+        } catch OPError.http(status: 401, body: _) {
+            me = try await verify(.basic)
+            authentication = .basic
+        }
+        try Task.checkCancellation()
         guard connectionIntent == intent else { throw CancellationError() }
-        let saved = try JSONEncoder().encode(StoredConnection(server: baseURL, token: token))
+        let saved = try JSONEncoder().encode(StoredConnection(server: baseURL, token: token,
+                                                            authentication: authentication))
         try Keychain.set(String(decoding: saved, as: UTF8.self), service: keychainService, account: "connection.v2")
         defaults.set(baseURL, forKey: urlKey)
         config = OPConfig(baseURL: baseURL, hasToken: true)
@@ -103,15 +121,16 @@ public final class OPClient {
         config = nil
     }
 
-    private func token() throws -> String {
+    private func credentials() throws -> StoredConnection {
         if let saved = try Keychain.get(service: keychainService, account: "connection.v2") {
             let value = try JSONDecoder().decode(StoredConnection.self, from: Data(saved.utf8))
             guard value.server == config?.baseURL else { throw OPError.notConfigured }
-            return value.token
+            return value
         }
         guard let t = try Keychain.get(service: keychainService, account: "token"), !t.isEmpty
         else { throw OPError.notConfigured }
-        return t
+        guard let server = config?.baseURL else { throw OPError.notConfigured }
+        return StoredConnection(server: server, token: t)
     }
 
     // MARK: - Endpoints
@@ -199,7 +218,8 @@ public final class OPClient {
         }
         var req = URLRequest(url: full)
         req.httpMethod = method
-        req.setValue("Bearer \(try token())", forHTTPHeaderField: "Authorization")
+        let credentials = try credentials()
+        req.setValue(credentials.effectiveAuthentication.authorization(credentials.token), forHTTPHeaderField: "Authorization")
         req.setValue("application/hal+json", forHTTPHeaderField: "Accept")
         if let body {
             req.httpBody = body

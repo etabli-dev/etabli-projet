@@ -1,6 +1,8 @@
 package com.raban.etabli.projet.net
 
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.core.DataStore
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockWebServer
@@ -9,7 +11,11 @@ import okhttp3.tls.HeldCertificate
 import java.nio.file.Files
 import javax.crypto.KeyGenerator
 
-internal fun service(block: suspend (MockWebServer, OPClient) -> Unit) = runBlocking {
+internal fun service(block: suspend (MockWebServer, OPClient) -> Unit) = accountService { server, create, _ ->
+    block(server, create(45_000))
+}
+
+internal fun accountService(block: suspend (MockWebServer, (Long) -> OPClient, DataStore<Preferences>) -> Unit) = runBlocking {
     val directory = Files.createTempDirectory("client-fixture").toFile()
     val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     try {
@@ -22,7 +28,7 @@ internal fun service(block: suspend (MockWebServer, OPClient) -> Unit) = runBloc
             val http = apiTransport().newBuilder().sslSocketFactory(clientTls.sslSocketFactory(), clientTls.trustManager).build()
             val store = PreferenceDataStoreFactory.create(scope = scope) { directory.resolve("prefs.preferences_pb") }
             val key = KeyGenerator.getInstance("AES").apply { init(256) }.generateKey()
-            block(server, OPClient(store, CredentialCipher { key }, http))
+            block(server, { timeout -> OPClient(store, CredentialCipher { key }, http, timeout) }, store)
         }
     } finally {
         scope.cancel()

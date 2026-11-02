@@ -7,6 +7,9 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.withTimeout
 import org.json.JSONException
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -16,13 +19,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
+import okhttp3.Credentials
 import okhttp3.Request
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 
 // OpenProject HAL+JSON client — Android twin of OPClient.swift.
-// Auth: single long-lived API token sent as `Authorization: Bearer <token>`.
+// Negotiate personal API-token authentication only during the safe connection GET.
 
 data class OPConfig(val baseURL: String, val hasToken: Boolean, val revision: Int = 0)
 
@@ -37,11 +41,32 @@ private val Context.opStore by preferencesDataStore(name = "op_config")
 private val KEY_URL   = stringPreferencesKey("baseURL")
 private val KEY_TOKEN = stringPreferencesKey("token")
 private val KEY_ENCRYPTED_TOKEN = stringPreferencesKey("encryptedToken")
+private val KEY_AUTH_MODE = stringPreferencesKey("authMode")
+
+private enum class AuthMode(val stored: String) {
+    Bearer("bearer"), Basic("basic");
+
+    fun authorization(token: String): String = when (this) {
+        Bearer -> "Bearer $token"
+        Basic -> Credentials.basic("apikey", token, Charsets.UTF_8)
+    }
+
+    companion object {
+        fun restore(value: String?): AuthMode = when (value) {
+            null, "bearer" -> Bearer
+            "basic" -> Basic
+            else -> throw OPError.Decoding("Stored authentication mode is invalid; reconnect.")
+        }
+    }
+}
+
+private data class StoredCredentials(val server: String, val token: String, val mode: AuthMode)
 
 class OPClient internal constructor(
     private val store: DataStore<Preferences>,
     private val cipher: CredentialCipher,
     private val http: OkHttpClient = apiTransport(),
+    private val connectionTimeoutMillis: Long = 45_000,
 ) {
     constructor(context: Context) : this(context.opStore, CredentialCipher.android(context.packageName + ".credentials.v1"))
 
@@ -59,12 +84,27 @@ class OPClient internal constructor(
         val base = serverBase(baseURL)
         require(token.isNotBlank()) { "Enter an API token" }
         val generation = configurationGeneration.incrementAndGet()
-        val me = fetch(Request.Builder().url("$base/api/v3/users/me").header("Authorization", "Bearer $token")
-            .header("Accept", "application/hal+json").build()) { OPMe.parse(it) }
+        val (me, mode) = withTimeout(connectionTimeoutMillis) {
+            suspend fun verify(mode: AuthMode): OPMe {
+                currentCoroutineContext().ensureActive()
+                if (configurationGeneration.get() != generation) throw CancellationException("Account changed")
+                return fetch(Request.Builder().url("$base/api/v3/users/me")
+                    .header("Authorization", mode.authorization(token))
+                    .header("Accept", "application/hal+json").build()) { OPMe.parse(it) }
+            }
+            try {
+                verify(AuthMode.Bearer) to AuthMode.Bearer
+            } catch (error: OPError.Http) {
+                if (error.status != 401) throw error
+                verify(AuthMode.Basic) to AuthMode.Basic
+            }
+        }
         store.edit { p ->
+            currentCoroutineContext().ensureActive()
             if (configurationGeneration.get() != generation) throw CancellationException("Account changed")
             p[KEY_URL] = base
             p[KEY_ENCRYPTED_TOKEN] = cipher.encrypt(token, base)
+            p[KEY_AUTH_MODE] = mode.stored
             p.remove(KEY_TOKEN)
         }
         return me
@@ -95,8 +135,9 @@ class OPClient internal constructor(
     }
 
     private suspend fun <T> get(path: String, parse: (JSONObject) -> T): T {
-        val (url, token) = currentCreds()
-        return fetch(Request.Builder().url(serverBase(url) + path).header("Authorization", "Bearer $token")
+        val credentials = currentCreds()
+        return fetch(Request.Builder().url(serverBase(credentials.server) + path)
+            .header("Authorization", credentials.mode.authorization(credentials.token))
             .header("Accept", "application/hal+json").build(), parse)
     }
     private suspend fun <T> fetch(request: Request, parse: (JSONObject) -> T): T {
@@ -108,13 +149,15 @@ class OPClient internal constructor(
         catch (e: Exception) { throw OPError.Transport(e.message ?: "Request failed") }
     }
 
-    private suspend fun currentCreds(): Pair<String, String> {
+    private suspend fun currentCreds(): StoredCredentials {
         var tok = ""
+        var mode = AuthMode.Bearer
         val prefs = store.edit { p ->
+            mode = AuthMode.restore(p[KEY_AUTH_MODE])
             tok = cipher.readAndMigrate(p, KEY_TOKEN, KEY_ENCRYPTED_TOKEN, p[KEY_URL].orEmpty())
         }
         val url = prefs[KEY_URL].orEmpty()
         if (url.isEmpty() || tok.isEmpty()) throw OPError.NotConfigured
-        return url to tok
+        return StoredCredentials(url, tok, mode)
     }
 }

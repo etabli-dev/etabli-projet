@@ -19,6 +19,20 @@ Android lists projects and work packages assigned to you. iOS additionally brows
 
 Create an OpenProject API token under My account → Access tokens. Enter the HTTPS server URL and token in Settings and connect. Browse Projects and My Work. On iOS open a work package to inspect or change its subject; a version conflict requires reloading before retrying.
 
+Connection setup tries Bearer authentication first. OpenProject 17.2+ supports
+newly generated personal API tokens this way; older servers use Basic with the
+fixed username `apikey`. After HTTP 401 on the connection check only, the client
+tries that Basic form once against the same HTTPS URL. It saves the successful
+method with your credentials and uses it for later requests without retries.
+Both connection attempts share a 45-second budget. Basic must be enabled on a
+server that requires it. See the [current authentication contract](https://www.openproject.org/docs/api/introduction/#authentication)
+and [17.2 release notes](https://www.openproject.org/docs/release-notes/17-2-0/).
+
+Existing saved accounts keep Bearer unless you reconnect successfully. The app
+does not perform OAuth sign-in or refresh OAuth access tokens; use a personal API
+token for this setup. Authentication fixtures are tested separately from live
+server acceptance.
+
 Use the canonical HTTPS URL: authenticated redirects are refused, and normal
 system certificate validation remains enabled. Reconnect after restoring an
 Android backup; the encrypted token file is deliberately excluded from backup.

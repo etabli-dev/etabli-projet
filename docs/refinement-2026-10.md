@@ -1,5 +1,69 @@
 # October 2026 refinement
 
+## API-token compatibility plan — 2026-11-02
+
+The [current OpenProject API contract](https://www.openproject.org/docs/api/introduction/#authentication)
+accepts personal API tokens as Bearer or Basic credentials. Bearer support for
+newly generated personal tokens arrived in [OpenProject 17.2](https://www.openproject.org/docs/release-notes/17-2-0/);
+older servers require Basic with username `apikey`. At the start of this
+increment, both clients sent Bearer unconditionally, while setup instructions
+gave no server-version boundary.
+
+Repair the connection handshake on both platforms: try Bearer first on the safe
+`GET /api/v3/users/me`, then retry that same HTTPS request once with Basic only
+after HTTP 401. Both attempts must share the existing 45-second budget. Persist
+the successful authentication mode atomically with validated credentials; records
+without a mode retain Bearer. Ordinary requests and subject updates use the saved
+mode without authentication retries. Keep failed-candidate preservation,
+cancellation, encrypted storage and Disconnect's generation guard intact.
+
+Acceptance: header-dependent fixtures cover current Bearer and Basic-only
+servers, restored old/new records, invalid credentials preserving the old
+account, no fallback after non-401 failures, one retry only, and Disconnect during
+the fallback. Swift updates must send the selected mode once without retrying a
+mutation. Update setup/release documentation and retain separate local build,
+remote CI and live-server evidence. No real-server acceptance is inferred from
+these fixtures.
+
+## API-token compatibility implementation and evidence — 2026-11-02
+
+Both clients now negotiate only while connecting a candidate account. They send
+Bearer first and retry the same HTTPS `GET /api/v3/users/me` once with Basic
+`apikey:<token>` only after HTTP 401. Redirects remain disabled; HTTP 403, server
+errors, transport failures and invalid identity responses do not trigger a
+fallback. Both attempts share the 45-second connection budget. Later connection
+checks, reads and Swift subject updates use the saved method without negotiation
+or mutation retries.
+
+The verified method is saved together with the URL and encrypted token in one
+Android DataStore transaction or the existing Swift Keychain envelope. Older
+records without a method retain Bearer; reconnecting can select Basic. Failed
+candidate checks preserve the existing account, and disconnect/cancellation
+guards still prevent a delayed response from restoring it. Basic must be enabled
+on a server that needs it. OAuth sign-in and token refresh are outside this
+personal-token setup.
+
+Local `python3 scripts/check_swift.py` passed in
+`projet-auth-swift-r2-20261102` on 2026-11-02. The production Foundation client and
+real Keychain wrapper typechecked, all SwiftUI files parsed, and executable
+fixtures checked header-dependent Bearer/Basic behavior, the remaining request
+timeout, persisted Basic restoration, both older Bearer storage formats, failed
+configuration and secure-write preservation, bounded retries, a single rejected
+PATCH and disconnect during a delayed Basic response. These fixtures use a fake
+Keychain and URLProtocol; they do not establish live-server acceptance or a full
+iOS application build for this increment.
+
+The Android TLS regressions cover Basic-only and current Bearer servers,
+persisted/restored modes, legacy credential migration, failure preservation,
+non-401 responses, delayed disconnect and the shared deadline. On 2026-11-02,
+`testDebugUnitTest lintDebug assembleDebug bundleRelease` passed in
+`projet-auth-android-20261102`. JUnit XML records 13 tests (eight client and five
+credential-cipher tests), with zero failures, errors or skips. The debug APK and
+unsigned release AAB include this increment. Earlier CI and device results below
+apply to their dated source states. Independent read-only review found no
+material authentication defect. Real OpenProject accounts, installed UI flows,
+release signing and store acceptance remain separate gates.
+
 ## First published CI run and follow-up
 
 On 2026-10-31, the [first published verification run](https://github.com/etabli-dev/etabli-projet/actions/runs/41200110679) failed in the Android SDK installation step with `sdkmanager: command not found` (exit 127), before Android tests, lint or packaging ran. The workflow now explicitly installs Android command-line tools using `android-actions/setup-android` v4.0.4, pinned to its verified commit, before requesting API 36 and build-tools 35.0.0. Existing checks and artifact collection remain intact. YAML and the action reference were checked locally before the follow-up run. Earlier local build and device evidence below remains separate from this failed remote run.

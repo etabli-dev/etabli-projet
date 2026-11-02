@@ -52,7 +52,7 @@ not the release upload identity.
 ## Implemented Android scope
 
 - Read-only OpenProject project and assigned-work browsing over HTTPS using OkHttp and HAL+JSON. Subject editing is an iOS feature, not an Android workflow.
-- The current Android client sends the API token as a Bearer credential. The token is encrypted with an app-specific Android Keystore key before persistence in DataStore; migration preserves existing settings.
+- Connection setup tries the personal API token as Bearer first, then Basic with username `apikey` once only after HTTP 401 on the same HTTPS identity-check GET. This supports both current Bearer-capable tokens and older Basic-only servers, where Basic must be enabled. The verified method is saved with the encrypted token in one DataStore transaction; existing records without a method retain Bearer.
 - Credentials are excluded from Android cloud backup/device transfer; restored installations must reconnect. Unreadable keys fail visibly without erasing stored preferences.
 - Kotlin 1.9.24, Compose, edge-to-edge layout, system-following light/dark themes and R8 rules preserving DTO field names.
 
@@ -75,6 +75,7 @@ whose data and signing identity must be preserved.
 - [ ] Run tests, lint and debug/release packaging for the exact candidate commit; retain results and artifact hashes.
 - [ ] Inspect the final APK/AAB manifest and verify minimum/target SDK, requested permissions, signatures and native-library/ZIP alignment. Keep 16 KiB-device execution separate from static alignment checks.
 - [ ] On a designated test account, connect to the canonical HTTPS OpenProject URL, browse Projects and My Work and exercise failure/cancellation paths.
+- [ ] Verify Bearer and Basic-only connection cases, restore the saved authentication method, and confirm invalid credentials or Disconnect cannot replace/restore an account. Ordinary requests use the saved method without authentication retries; no OAuth sign-in or refresh flow is provided.
 - [ ] Verify encrypted credential migration and unreadable-key handling, account persistence and reconnect after backup restore. Preserve real account settings and server work packages.
 - [ ] Check rotation, insets, large text, accessibility and the minified release variant; retain documented project/work-package result limits.
 - [ ] Configure and verify the private upload key, Play App Signing, release version code and recovery backups. Generate and inspect the signed release candidate.

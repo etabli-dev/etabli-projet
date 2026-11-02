@@ -14,18 +14,29 @@ enum Keychain {
 final class FixtureProtocol: URLProtocol, @unchecked Sendable {
     static var replies: [(Int, String)] = []
     static var requests: [URLRequest] = []
+    static var requestHandler: ((URLRequest) -> (Int, String))?
+    private let stateLock = NSLock()
+    private var stopped = false
     override class func canInit(with request: URLRequest) -> Bool { true }
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
     override func startLoading() {
         Self.requests.append(request)
-        guard !Self.replies.isEmpty else { client?.urlProtocol(self, didFailWithError: URLError(.badServerResponse)); return }
-        let (status, body) = Self.replies.removeFirst()
+        let status: Int
+        let body: String
+        if let handler = Self.requestHandler {
+            (status, body) = handler(request)
+        } else {
+            guard !Self.replies.isEmpty else { client?.urlProtocol(self, didFailWithError: URLError(.badServerResponse)); return }
+            (status, body) = Self.replies.removeFirst()
+        }
+        stateLock.lock(); let cancelled = stopped; stateLock.unlock()
+        if cancelled { return }
         let response = HTTPURLResponse(url: request.url!, statusCode: status, httpVersion: "HTTP/1.1", headerFields: ["Content-Type": "application/json", "Content-Length": String(body.utf8.count)])!
         client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
         client?.urlProtocol(self, didLoad: Data(body.utf8))
         client?.urlProtocolDidFinishLoading(self)
     }
-    override func stopLoading() { }
+    override func stopLoading() { stateLock.lock(); stopped = true; stateLock.unlock() }
 }
 func fixtureSession() -> URLSession {
     let config = URLSessionConfiguration.ephemeral

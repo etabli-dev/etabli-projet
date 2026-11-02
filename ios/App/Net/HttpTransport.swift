@@ -6,7 +6,24 @@ enum ClientHTTPError: LocalizedError {
     case invalid(String)
     var errorDescription: String? { if case .invalid(let message) = self { return message }; return nil }
 }
-struct StoredConnection: Codable { let server: URL; let token: String }
+enum OPAuthentication: String, Codable {
+    case bearer, basic
+
+    func authorization(_ token: String) -> String {
+        switch self {
+        case .bearer: return "Bearer \(token)"
+        case .basic: return "Basic " + Data("apikey:\(token)".utf8).base64EncodedString()
+        }
+    }
+}
+
+struct StoredConnection: Codable {
+    let server: URL
+    let token: String
+    // Existing envelopes have no mode and retain their Bearer behavior.
+    var authentication: OPAuthentication? = nil
+    var effectiveAuthentication: OPAuthentication { authentication ?? .bearer }
+}
 
 func secureServer(_ url: URL) throws -> URL {
     guard url.scheme?.lowercased() == "https", url.host?.isEmpty == false,
@@ -24,7 +41,7 @@ final class ClientHTTP: @unchecked Sendable {
         guard let url = request.url, url.scheme?.lowercased() == "https", url.user == nil, url.password == nil else {
             throw ClientHTTPError.invalid("Authenticated requests require HTTPS")
         }
-        var copy = request; copy.timeoutInterval = 45
+        var copy = request; copy.timeoutInterval = min(request.timeoutInterval, 45)
         return copy
     }
     func data(for request: URLRequest) async throws -> (Data, URLResponse) {
