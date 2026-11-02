@@ -2,11 +2,13 @@
 
 ## First published CI run and follow-up
 
-On 2026-10-31, the [first published verification run](https://github.com/etabli-dev/etabli-projet/actions/runs/41200110679) failed in the Android SDK installation step with `sdkmanager: command not found` (exit 127), before Android tests, lint or packaging ran. The workflow now explicitly installs Android command-line tools using `android-actions/setup-android` v4.0.4, pinned to its verified commit, before requesting API 36 and build-tools 35.0.0. Existing checks and artifact collection remain intact. YAML and the action reference were checked locally; the follow-up remote Android result is pending. Earlier local build and device evidence below remains separate from this failed remote run.
+On 2026-10-31, the [first published verification run](https://github.com/etabli-dev/etabli-projet/actions/runs/41200110679) failed in the Android SDK installation step with `sdkmanager: command not found` (exit 127), before Android tests, lint or packaging ran. The workflow now explicitly installs Android command-line tools using `android-actions/setup-android` v4.0.4, pinned to its verified commit, before requesting API 36 and build-tools 35.0.0. Existing checks and artifact collection remain intact. YAML and the action reference were checked locally before the follow-up run. Earlier local build and device evidence below remains separate from this failed remote run.
+
+Later on 2026-10-31, the [follow-up verification run](https://github.com/etabli-dev/etabli-projet/actions/runs/41200530308) passed for [commit `718f7597603c`](https://github.com/etabli-dev/etabli-projet/commit/718f7597603cdac5a3c300f866656727fad04e1b): Android `testDebugUnitTest lintDebug assembleDebug bundleRelease` and the full unsigned iOS simulator build succeeded. The [documentation build and deployment](https://github.com/etabli-dev/etabli-projet/actions/runs/41200530495) also passed for that commit. These results verify compilation and the recorded automated checks; installed application journeys, release signing and store acceptance remain separate gates.
 
 ## Scope and acceptance
 
-Harden the existing self-hosted client without changing server APIs or deleting user configuration. Required gates: reproducible Android unit tests, lint and APK build; secure credential migration; explicit network failures; accurate setup and platform status. iOS and live-server acceptance are separate gates.
+Harden the existing self-hosted client without changing server APIs or deleting user configuration. Required gates: reproducible Android unit tests, lint and APK build; secure credential migration; explicit network failures; accurate setup and platform status. iOS device and live-server acceptance are separate gates.
 
 ## Findings and roadmap
 
@@ -14,13 +16,13 @@ Harden the existing self-hosted client without changing server APIs or deleting 
 |---|---|---|
 | Major: plaintext API token | Android network client persists the token in ordinary preferences DataStore, contrary to the privacy statement. | Encrypt using an app-specific Android Keystore AES-256-GCM key; bind ciphertext to the configured server. Test round-trip, tampering, changed server, lost key and legacy migration. |
 | Major: credential backup | Backup configuration says there is no personal information and includes the default data. | Exclude the credential DataStore from cloud backup and device transfer on both Android backup schemas. Restored installations must reconnect. |
-| Verification gap | Existing CI builds documentation only; no tracked application tests. | Add meaningful regression tests and Android build checks; exercise the real server separately. |
+| Verification gap | At baseline, CI built documentation only and there were no tracked application tests. | Add meaningful regression tests and Android build checks; exercise the real server separately. |
 
 ## Implemented increment
 
 The encrypted token and legacy-key removal are written in one DataStore transaction. Existing plaintext tokens migrate on the first authenticated request; failed encryption retains the original settings. Unreadable ciphertext is refused with a reconnect instruction, never used as an authentication token. No additional production dependency is introduced.
 
-Crypto follows the [Android Keystore documentation](https://developer.android.com/reference/android/security/keystore/KeyGenParameterSpec). Device Keystore behavior still needs instrumentation/device verification; JVM tests cover encryption and migration logic.
+Crypto follows the [Android Keystore documentation](https://developer.android.com/reference/android/security/keystore/KeyGenParameterSpec). JVM tests cover encryption and migration logic. The [device coverage below](#android-keystore-device-coverage) records four passing production-Keystore tests on the API 36 emulator with 4 KiB pages; physical-device hardware backing and backup restoration remain unverified.
 
 ## Verification
 
@@ -64,17 +66,19 @@ no longer hide otherwise valid documents.
 Swift client tests pass with a fake Keychain and URLProtocol responses, including
 failed configuration preservation and actual account restore. The production
 Foundation sources, including the real Keychain wrapper, typecheck locally;
-SwiftUI sources parse, but full app compilation requires Xcode. Credentials now
+SwiftUI sources parsed locally; the full unsigned simulator build later passed
+in the 2026-10-31 CI run above. Credentials now
 use one server/token Keychain envelope, with legacy reads preserved. JSON requests
 are cancellable and bounded; Doc downloads stream to a temporary file with a
 256 MiB bound. UI loads reject responses from older selections/accounts.
 
 Package inspection: all produced 64-bit ELF load segments and APK entries meet
-16 KiB alignment; the AAB contains no signing block. CI is prepared, not remotely
-observed. The README gives exact setup commands and current platform differences.
-Live server/device acceptance, signing and publication remain external gates.
+16 KiB alignment; the AAB contains no signing block. The 2026-10-31 remote CI
+outcome is recorded above. The README gives exact setup commands and current
+platform differences. Live server/device acceptance, release signing and store
+submission remain external gates.
 
-Final screen revisions were followed by another complete local Android test/lint/debug APK/release AAB run and `python3 scripts/check_swift.py`; both passed on 2026-10-30. Production Foundation clients and Keychain code typechecked; all SwiftUI files parsed. The unsigned full iOS build is prepared in CI but was not run locally (Xcode is absent).
+Final screen revisions were followed by another complete local Android test/lint/debug APK/release AAB run and `python3 scripts/check_swift.py`; both passed on 2026-10-30. Production Foundation clients and Keychain code typechecked; all SwiftUI files parsed. The full unsigned iOS simulator build subsequently passed in the 2026-10-31 CI run above; it was not run locally because Xcode is absent.
 
 ## Local account lifecycle review
 
