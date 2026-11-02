@@ -1,57 +1,87 @@
 # Établi Projet — Android submission checklist
 
-## Build outputs
-- **Debug APK** — `app/build/outputs/apk/debug/app-debug.apk`
-  - App ID `com.raban.etabli.projet.debug` (`.debug` suffix so it coexists with release).
-- **Release AAB** — `app/build/outputs/bundle/release/app-release.aab`
-  - R8 + resource shrinking. Signed with `app/upload-keystore.jks`.
-  - **Upload this** to Play Console.
+This guide describes the current source and release prerequisites. Observed build
+and test results are recorded in [the refinement record](../docs/refinement-2026-10.md).
+Compilation, local installation and Google Play acceptance are separate checks.
 
-## Signing
-Keystore at `app/upload-keystore.jks`; credentials in `keystore.properties` (gitignored).
+## Toolchain and build outputs
 
-> ⚠ The keystore was generated locally with a placeholder password (`android`). Before publishing, regenerate it with a strong password (or use Play App Signing). **Back up `upload-keystore.jks`** — losing it means losing the ability to ship updates to the same app.
+Use JDK 17, Android SDK Platform 36 and Build Tools 35.0.0. Set `JAVA_HOME` and
+`ANDROID_HOME`; the pinned wrapper supplies Gradle 8.13 with AGP 8.13.2. The app
+compiles and targets API 36 and supports API 26+. As checked on 2026-11-02, API 36
+meets the [Google Play target requirement for new apps and updates](https://developer.android.com/google/play/requirements/target-sdk);
+check the requirement again at submission time.
 
-```bash
-keytool -genkeypair -v -keystore app/upload-keystore.jks -alias upload \
-  -keyalg RSA -keysize 2048 -validity 10000 \
-  -dname "CN=Your Name, O=Your Org, C=DE"
+From the repository root:
+
+```sh
+cd android
+./gradlew --no-daemon testDebugUnitTest lintDebug assembleDebug bundleRelease
 ```
 
-## What's done (technical)
-- Target SDK 34, min SDK 26
-- Kotlin 1.9.24 + Compose BOM 2024.06.00 (Coder DS theme byte-identical with the rest of the suite)
-- DataStore Preferences for persisted state
-- OpenProject HAL+JSON client via OkHttp
-- Bearer-token auth; token stored in DataStore (replace with EncryptedSharedPreferences for production hardening)
-- Edge-to-edge insets via `enableEdgeToEdge()`
-- Light + Dark themes (system-following)
-- R8 + resource shrinking on release
-- Proguard rules keep DTO field names so JSON wire format is stable across upgrades
+| Output | Identity and signing |
+|---|---|
+| `app/build/outputs/apk/debug/app-debug.apk` | Android debug signing; ID `com.raban.etabli.projet.debug`, separate from release data. |
+| `app/build/outputs/bundle/release/app-release.aab` | ID `com.raban.etabli.projet`; R8 and resource shrinking enabled. Unsigned unless private release signing is configured. |
 
-## What you must do before publishing
-- [ ] **Real upload key** — see signing section
-- [ ] **Privacy policy URL** — required for Play Store
-- [ ] **Store listing assets**:
-  - Short description (≤80 chars) and full description (≤4000 chars)
-  - 512×512 PNG hi-res icon
-  - 1024×500 PNG feature graphic
-  - ≥2 phone screenshots (1080×1920+ portrait)
-- [ ] **Content rating questionnaire** — IARC, ~5 min in Play Console
-- [ ] **Data safety form** — declare what's collected (user-entered server URL + API token. Personal/work data flows directly between this app and YOUR OpenProject instance. No data ever reaches us.)
-- [ ] **Target audience and content** — pick "Adults" unless intended for children
-- [ ] **App category** — "Productivity"
-- [ ] **Pricing & distribution** — free/paid + countries
-- [ ] **AD_ID exclusion** — confirm in Play Console that you don't use ads
+An unsigned AAB is a review artifact, not a Play upload. Output existence alone
+does not establish signing, device behavior or store readiness.
 
-## Test before upload
-```bash
+## Private release signing
+
+`app/build.gradle.kts` optionally reads `android/keystore.properties`. A `storeFile`
+entry enables release signing; `storePassword`, `keyAlias` and `keyPassword` must
+match the private keystore. Relative `storeFile` paths resolve from `android/`;
+an absolute path outside the checkout also works. Without that configuration,
+release builds remain unsigned. A configured missing or invalid key fails the
+build rather than silently producing a signed release.
+
+No particular keystore, alias or password is assumed to exist. Use the upload
+identity registered for this application, or establish one for a new application.
+Preserve existing keys, certificates and backups; do not replace a key merely to
+follow this guide. The repository ignores `keystore.properties`, `*.jks` and
+`*.keystore`; keep credentials and key backups private.
+
+[Play App Signing](https://developer.android.com/studio/publish/app-signing)
+separates the upload key from the app signing key used for distributed APKs.
+Configure it for bundle distribution and verify the upload certificate before
+uploading. A lost upload key can be reset through Play's process; losing an
+unmanaged app signing key has different consequences for updates. A debug key is
+not the release upload identity.
+
+## Implemented Android scope
+
+- Read-only OpenProject project and assigned-work browsing over HTTPS using OkHttp and HAL+JSON. Subject editing is an iOS feature, not an Android workflow.
+- The current Android client sends the API token as a Bearer credential. The token is encrypted with an app-specific Android Keystore key before persistence in DataStore; migration preserves existing settings.
+- Credentials are excluded from Android cloud backup/device transfer; restored installations must reconnect. Unreadable keys fail visibly without erasing stored preferences.
+- Kotlin 1.9.24, Compose, edge-to-edge layout, system-following light/dark themes and R8 rules preserving DTO field names.
+
+## Device and release review
+
+From `android/`, install the debug artifact on a designated test device without
+clearing existing app data:
+
+```sh
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 adb shell am start -n com.raban.etabli.projet.debug/com.raban.etabli.projet.MainActivity
-
-# To install the release AAB locally:
-# brew install bundletool
-bundletool build-apks --bundle=app/build/outputs/bundle/release/app-release.aab \
-  --output=/tmp/projet.apks --mode=universal
-bundletool install-apks --apks=/tmp/projet.apks
 ```
+
+For the minified bundle, use [Android Studio or bundletool](https://developer.android.com/tools/bundletool)
+to generate and install a test APK set with an explicitly chosen signing identity.
+Without signing options, bundletool may use a debug key; this does not validate the
+Play upload certificate. Keep test installs separate from any production release
+whose data and signing identity must be preserved.
+
+- [ ] Run tests, lint and debug/release packaging for the exact candidate commit; retain results and artifact hashes.
+- [ ] Inspect the final APK/AAB manifest and verify minimum/target SDK, requested permissions, signatures and native-library/ZIP alignment. Keep 16 KiB-device execution separate from static alignment checks.
+- [ ] On a designated test account, connect to the canonical HTTPS OpenProject URL, browse Projects and My Work and exercise failure/cancellation paths.
+- [ ] Verify encrypted credential migration and unreadable-key handling, account persistence and reconnect after backup restore. Preserve real account settings and server work packages.
+- [ ] Check rotation, insets, large text, accessibility and the minified release variant; retain documented project/work-package result limits.
+- [ ] Configure and verify the private upload key, Play App Signing, release version code and recovery backups. Generate and inspect the signed release candidate.
+- [ ] Provide a working privacy-policy URL and in-app policy access. Complete [Data safety and SDK review](https://support.google.com/googleplay/android-developer/answer/10144311?hl=en) against the actual artifact. Describe configured-server authentication and project/work requests, encrypted local tokens and backup exclusions; fixture tests do not establish a production OpenProject connection. Do not substitute a blanket “no third-party SDKs” assertion.
+- [ ] Prepare listing text, icon, feature graphic and screenshots of the current app. Complete content rating, accurate target audience, app category, advertising declaration, pricing and distribution in Play Console.
+- [ ] Complete applicable permission declarations and account-specific testing/release requirements. Validate the signed candidate on an internal test track before requesting production rollout.
+
+Publishing source or documentation does not publish an Android app. A signed
+release, Play upload, policy approval and production rollout require their own
+recorded outcomes.
