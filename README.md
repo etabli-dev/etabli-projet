@@ -10,10 +10,18 @@ Android lists projects and work packages assigned to you. iOS additionally brows
 
 Établi Projet is **under active development**. There are no App Store, Google Play or F-Droid releases yet.
 
-- **Android:** install the current **development build** as a signed **APK** from **[GitHub Releases](../../releases)**.
+- **Android:** install the current **development build** as a debug-signed **APK** from **[GitHub Releases](../../releases)** (v0.1.0, built before the October–November 2026 changes).
 - **App Store (iOS):** planned — not yet available.
 - **Google Play:** planned — not yet available.
 - **F-Droid:** planned — not yet available.
+
+## Platforms
+
+Établi Projet is a mobile app for Android and iOS, including tablets. Desktop
+applications for Ubuntu/Debian, Windows and macOS are not planned; use the
+OpenProject web interface there. The [platform roadmap](docs/platform-roadmap.md)
+lists the remaining Android/iOS feature differences, signing and store steps, and
+their acceptance criteria.
 
 ## First use
 
