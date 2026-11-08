@@ -5,6 +5,8 @@
 Android release steps are detailed in
 [android/SUBMISSION.md](https://github.com/etabli-dev/etabli-projet/blob/main/android/SUBMISSION.md).
 
+The [2026-11-08 Apple refinement](apple-audit-2026-11-08.md) records the implemented iOS metadata/detail parity and current unsigned build verification. Live-service and signed-distribution gates remain open.
+
 ## 1. Platform role
 
 Établi Projet is a **mobile-only** app for Android and iOS, on phones and tablets (the iOS

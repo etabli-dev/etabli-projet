@@ -75,7 +75,7 @@ struct MyWorkView: View {
     }
 
     private func subtitle(_ wp: OPWorkPackage) -> String {
-        [wp.projectName, wp.statusName, wp.typeName].compactMap { $0 }.joined(separator: " · ")
+        [wp.projectName, wp.statusName, wp.typeName, wp.priorityName].compactMap { $0 }.joined(separator: " · ")
     }
     private func statusGlyph(_ wp: OPWorkPackage) -> some View {
         let name = (wp.statusName ?? "").lowercased()

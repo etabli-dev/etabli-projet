@@ -43,7 +43,7 @@ struct ProjectsView: View {
                                 } label: {
                                     ListRow(
                                         title: p.name ?? "(unnamed)",
-                                        metadata: p.identifier,
+                                        metadata: [p.identifier, p.description?.raw?.trimmingCharacters(in: .whitespacesAndNewlines)].compactMap { $0 }.filter { !$0.isEmpty }.map { String($0.prefix(200)) }.joined(separator: " · "),
                                         leading: { Image(systemName: "folder").foregroundStyle(Theme.Color.accent) },
                                         trailing: {
                                             Image(systemName: "chevron.right")
@@ -129,7 +129,7 @@ struct ProjectWorkPackagesView: View {
                                 Button { selected = wp } label: {
                                     ListRow(
                                         title: wp.subject ?? "(no subject)",
-                                        metadata: [wp.statusName, wp.typeName].compactMap { $0 }.joined(separator: " · "),
+                                        metadata: [wp.statusName, wp.typeName, wp.priorityName].compactMap { $0 }.joined(separator: " · "),
                                         leading: { Image(systemName: "doc").foregroundStyle(Theme.Color.accent) },
                                         trailing: {
                                             Image(systemName: "chevron.right")
