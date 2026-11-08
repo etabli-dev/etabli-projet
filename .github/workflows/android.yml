@@ -41,3 +41,5 @@ jobs:
         run: python3 scripts/check_swift.py
       - name: Build unsigned iOS simulator app
         run: xcodebuild -project ios/EtabliProjet.xcodeproj -scheme EtabliProjet -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
+      - name: Build unsigned iOS device Release app
+        run: xcodebuild -project ios/EtabliProjet.xcodeproj -scheme EtabliProjet -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO build
