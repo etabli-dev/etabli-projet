@@ -36,6 +36,10 @@ $font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, 
 $font-family-monospace:  "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
 $headings-font-weight: 600;
 
+// The Cosmo base theme @imports Source Sans Pro from Google Fonts. This theme sets the system
+// font stack above instead, so switch the import off and the site makes no request to Google.
+$web-font-path: false;
+
 /*-- scss:rules --*/
 .navbar {
   background-color: $coder-accent !important;
