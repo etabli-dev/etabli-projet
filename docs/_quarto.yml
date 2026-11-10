@@ -4,6 +4,9 @@ project:
 
 format:
   html:
+    include-in-header:
+      - text: |
+          <script defer data-domain="etabli-dev.github.io" src="https://analytics.hellebo.de/js/script.file-downloads.outbound-links.js"></script>
     theme:
       light: [cosmo, theme/etabli.scss]
       dark: [cosmo, theme/etabli-dark.scss]
@@ -82,3 +85,7 @@ website:
         href: "https://liberapay.com/rabanheller/"
       - text: "GitHub"
         href: "https://github.com/etabli-dev/etabli-projet"
+      - text: "Impressum"
+        href: impressum.qmd
+      - text: "Datenschutz"
+        href: datenschutz.qmd
