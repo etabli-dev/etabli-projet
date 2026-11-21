@@ -1,15 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Établi Projet: adaptive-icon foreground, generated from the shared icon glyph
+     (glyph ≈70% of the visible icon, stroke 44 @1024; aligned to the Établi suite icon, Nov 2026). -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- "~/" mark in pseudo-mono; matches the iOS placeholder icon. -->
-    <group android:translateX="22" android:translateY="76">
-        <path
-            android:pathData="M 0 -30 L 12 -30 L 12 -22 L 0 -22 Z"
-            android:fillColor="#FFFFFF"/>
-        <path
-            android:pathData="M 18 -10 L 42 -50 L 50 -50 L 26 -10 Z"
-            android:fillColor="#FFFFFF"/>
+    <group android:scaleX="0.091078" android:scaleY="0.091078"
+        android:translateX="5.7287" android:translateY="7.3681">
+        <path android:pathData="M 660 380 H 316 A 36 36 0 0 0 280 416 V 608 A 36 36 0 0 0 316 644 H 600"
+            android:strokeColor="#FFFFFF" android:strokeWidth="32.609" android:strokeLineCap="round" android:strokeLineJoin="round"/>
+        <path android:pathData="M440,512 L780,512"
+            android:strokeColor="#FFFFFF" android:strokeWidth="32.609" android:strokeLineCap="round" android:strokeLineJoin="round"/>
     </group>
 </vector>
