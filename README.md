@@ -2,18 +2,18 @@
 
 > OpenProject projects and assigned work.
 
-`iOS` `Android` · All rights reserved · Part of the [Établi Suite](https://github.com/etabli-dev)
+`iOS` `Android` · AGPL-3.0-only · Part of the [Établi Suite](https://github.com/etabli-dev)
 
 Android lists projects and work packages assigned to you. iOS additionally browses a project’s work packages, searches within a project and edits work-package subjects with optimistic lock-version handling. Assignment changes are not implemented. Lists currently request up to 200 projects and 100 work packages in the screens; further UI pagination is deferred.
 
 ## Availability
 
-Établi Projet is **under active development**. There are no App Store or Google Play releases yet.
+Établi Projet is **under active development**. There are no App Store, Google Play or F-Droid releases yet.
 
 - **Android:** install the current **development build** as a debug-signed **APK** from **[GitHub Releases](../../releases)** (v0.1.0, built before the October–November 2026 changes).
 - **App Store (iOS):** planned — not yet available.
 - **Google Play:** planned — not yet available.
-- **F-Droid:** not planned (F-Droid requires a free licence).
+- **F-Droid:** planned — not yet available.
 
 ## Platforms
 
@@ -113,6 +113,8 @@ resolve device findings, configure signing and prepare the store package for app
 
 ## License
 
-Proprietary, all rights reserved — see [LICENSE](LICENSE) and [NOTICE](NOTICE). Third-party components keep
-their own licences. Versions published before 22 November 2026 remain available under Apache-2.0.
+GNU Affero General Public License v3.0 only (AGPL-3.0-only) — see [LICENSE](LICENSE) and
+[NOTICE](NOTICE). Commercial licences are available from the copyright holder
+(etabli.dev@outlook.com). Third-party components keep their own licences. Versions published
+before 22 November 2026 remain available under Apache-2.0.
 Copyright 2026 R. Heller.
