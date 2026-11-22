@@ -79,7 +79,7 @@ website:
             - text: "Fonctionnalités"
               href: fr/features.qmd
   page-footer:
-    left: "Apache-2.0 · © 2026 R. Heller"
+    left: "All rights reserved · © 2026 R. Heller"
     right:
       - text: "Liberapay"
         href: "https://liberapay.com/rabanheller/"

@@ -1,5 +1,8 @@
 # Platform roadmap
 
+> **Note (22 November 2026):** this project is now proprietary (all rights reserved). F-Droid only
+> publishes free software, so every F-Droid step below is void.
+
 Établi Projet · state as of 2026-11-08 · this is a plan. Observed results stay in the
 [current status page](current-status.qmd) and the [refinement record](refinement-2026-10.md);
 Android release steps are detailed in
