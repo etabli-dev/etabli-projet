@@ -2,7 +2,7 @@
 
 > OpenProject projects and assigned work.
 
-`iOS` `Android` · Apache-2.0 · Part of the [Établi Suite](https://github.com/etabli-dev)
+`iOS` `Android` · AGPL-3.0-only · Part of the [Établi Suite](https://github.com/etabli-dev)
 
 Android lists projects and work packages assigned to you. iOS additionally browses a project’s work packages, searches within a project and edits work-package subjects with optimistic lock-version handling. Assignment changes are not implemented. Lists currently request up to 200 projects and 100 work packages in the screens; further UI pagination is deferred.
 
@@ -113,5 +113,8 @@ resolve device findings, configure signing and prepare the store package for app
 
 ## License
 
-Apache License 2.0 — see [LICENSE](LICENSE) and [NOTICE](NOTICE).
+GNU Affero General Public License v3.0 only (AGPL-3.0-only) — see [LICENSE](LICENSE) and
+[NOTICE](NOTICE). Commercial licences are available from the copyright holder
+(etabli.dev@outlook.com). Third-party components keep their own licences. Versions published
+before 22 November 2026 remain available under Apache-2.0.
 Copyright 2026 R. Heller.

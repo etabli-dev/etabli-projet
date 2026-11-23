@@ -38,6 +38,7 @@ Die durch den Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten
 unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung,
 Verbreitung und jede Art der Verwertung außerhalb der Grenzen des
 Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw.
-Erstellers. Der Quellcode dieser Website steht unter der Apache-2.0-Lizenz.
+Erstellers. Der Quellcode steht unter der GNU Affero General Public License, Version 3
+(AGPL-3.0-only); kommerzielle Lizenzen sind auf Anfrage erhältlich.
 
 Siehe auch die [Datenschutzerklärung](datenschutz.qmd).

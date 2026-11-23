@@ -1,5 +1,5 @@
 // Copyright 2026 R. Heller
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: AGPL-3.0-only
 //
 // CoderTheme.swift - generated from _style/tokens/coder-design-system.json
 // DO NOT hand-edit values. Re-derive from the central token file at build time

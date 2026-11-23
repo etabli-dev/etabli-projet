@@ -1,7 +1,8 @@
 # Contributing to Etabli Projet
 
-By submitting a contribution you agree it is licensed under the **Apache License 2.0**
-(see section 5 of the license).
+This project is dual-licensed: AGPL-3.0-only, or a commercial licence from the copyright
+holder (etabli.dev@outlook.com). Please open an issue before proposing changes; contributions can only be accepted
+under a written contributor agreement that allows the copyright holder to offer both licences.
 
 ## House rules
 - **Privacy is a hard constraint.** No analytics, telemetry, or third-party SDKs.
