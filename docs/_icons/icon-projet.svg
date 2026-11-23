@@ -1,9 +1,10 @@
-<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Projet">
+  <!-- Établi Projet icon. Coder design system: #28A745 tile, white glyph, one-line glyph ≈70% of the tile, stroke 44 @1024 (aligned to the suite icon, Nov 2026). -->
   <rect width="1024" height="1024" fill="#28A745"/>
-  <g id="glyph" fill="#FFFFFF" stroke="none">
-    <!-- Three stacked task bars, slightly offset like a small Gantt chart -->
-    <rect x="280" y="340" width="380" height="80" rx="14"/>
-    <rect x="360" y="472" width="430" height="80" rx="14"/>
-    <rect x="300" y="604" width="320" height="80" rx="14"/>
+  <g transform="translate(512,512) scale(1.34930) translate(-530.00,-512.00)">
+  <g stroke-width="32.609" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 660 380 H 316 A 36 36 0 0 0 280 416 V 608 A 36 36 0 0 0 316 644 H 600" fill="none" stroke="#FFFFFF"/>
+    <line x1="440" y1="512" x2="780" y2="512" fill="none" stroke="#FFFFFF"/>
+  </g>
   </g>
 </svg>
