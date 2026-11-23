@@ -1,7 +1,7 @@
 # Contributing to Etabli Projet
 
 This project is dual-licensed: AGPL-3.0-only, or a commercial licence from the copyright
-holder. Please open an issue before proposing changes; contributions can only be accepted
+holder (etabli.dev@outlook.com). Please open an issue before proposing changes; contributions can only be accepted
 under a written contributor agreement that allows the copyright holder to offer both licences.
 
 ## House rules
