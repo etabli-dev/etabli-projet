@@ -5,8 +5,6 @@ import SwiftUI
 
 struct SettingsView: View {
     @Environment(OPClient.self) private var client
-    @AppStorage(ThemePreference.userDefaultsKey) private var themeRaw: String = ThemePreference.system.rawValue
-    private var theme: ThemePreference { ThemePreference(rawValue: themeRaw) ?? .system }
 
     @State private var urlText: String = ""
     @State private var token: String = ""
@@ -27,9 +25,9 @@ struct SettingsView: View {
                     } else {
                         connectCard
                     }
-                    themeCard
+                    AppearanceCard()
                     aboutCard
-                }.padding(Theme.Space.lg)
+                }.padding(Theme.Space.lg).readableColumn()
             }
         }
         .navigationBarHidden(true)
@@ -61,7 +59,7 @@ struct SettingsView: View {
             VStack(alignment: .leading, spacing: Theme.Space.md) {
                 MonoLabel(cfg.baseURL.absoluteString, color: Theme.Color.ink)
                 if let testResult {
-                    StatusLabel(testResult, tone: .accent)
+                    StatusLabel(testResult, tone: .success)
                 }
                 if let testError {
                     Text(testError).font(Theme.Font.body).foregroundStyle(Theme.Color.danger)
@@ -72,29 +70,17 @@ struct SettingsView: View {
                         Task { await test() }
                     }
                     Button(role: .destructive) {
-                        try? client.disconnect()
-                        testResult = nil; testError = nil
+                        do { try client.disconnect(); testResult = nil; testError = nil }
+                        catch { testError = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription }
                     } label: {
                         Text("Disconnect").font(Theme.Font.body.weight(.semibold))
                             .padding(.horizontal, Theme.Space.md).padding(.vertical, Theme.Space.sm)
-                            .foregroundStyle(Theme.Color.surface)
+                            .foregroundStyle(Theme.Color.onAccent)
                             .background(Theme.Color.danger)
                             .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.sm))
                     }.buttonStyle(.plain)
                 }
             }
-        }
-    }
-
-    private var themeCard: some View {
-        Card(title: "appearance", systemImage: "paintbrush") {
-            Picker("Theme", selection: Binding(
-                get: { theme }, set: { themeRaw = $0.rawValue }
-            )) {
-                ForEach(ThemePreference.allCases) { p in
-                    Label(p.label, systemImage: p.systemImage).tag(p)
-                }
-            }.pickerStyle(.segmented)
         }
     }
 
@@ -109,7 +95,8 @@ struct SettingsView: View {
     }
 
     @ViewBuilder
-    private func field(_ label: String, text: Binding<String>, placeholder: String, secure: Bool = false) -> some View {
+    private func field(_ label: LocalizedStringKey, text: Binding<String>, placeholder: LocalizedStringKey,
+                       secure: Bool = false) -> some View {
         VStack(alignment: .leading, spacing: Theme.Space.xs) {
             MonoLabel(label, color: Theme.Color.faint)
             Group {
@@ -130,13 +117,14 @@ struct SettingsView: View {
 
     private func connect() {
         guard let url = URL(string: urlText.trimmingCharacters(in: .whitespaces)) else {
-            testError = "Invalid URL"; return
+            testError = String(localized: "Invalid URL"); return
         }
         testing = true; testError = nil; testResult = nil
         Task {
             do {
                 let me = try await client.configure(baseURL: url, token: token.trimmingCharacters(in: .whitespaces))
-                testResult = "Signed in as \(me.name ?? "user \(me.id)")"
+                token = ""
+                testResult = String(localized: "Signed in as \(me.name ?? String(localized: "user \(me.id)"))")
             } catch {
                 testError = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
             }
@@ -148,7 +136,7 @@ struct SettingsView: View {
         testing = true; testError = nil
         do {
             let me = try await client.testConnection()
-            testResult = "Signed in as \(me.name ?? "user \(me.id)")"
+            testResult = String(localized: "Signed in as \(me.name ?? String(localized: "user \(me.id)"))")
         } catch {
             testError = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
         }

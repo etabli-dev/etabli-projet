@@ -5,6 +5,7 @@ import SwiftUI
 
 struct ProjectsView: View {
     @Environment(OPClient.self) private var client
+    @Environment(\.themeAccent) private var accent
     @State private var projects: [OPProject] = []
     @State private var loading = false
     @State private var loadRequest = UUID()
@@ -42,9 +43,9 @@ struct ProjectsView: View {
                                     ProjectWorkPackagesView(project: p)
                                 } label: {
                                     ListRow(
-                                        title: p.name ?? "(unnamed)",
+                                        title: p.name ?? String(localized: "(unnamed)"),
                                         metadata: [p.identifier, p.description?.raw?.trimmingCharacters(in: .whitespacesAndNewlines)].compactMap { $0 }.filter { !$0.isEmpty }.map { String($0.prefix(200)) }.joined(separator: " · "),
-                                        leading: { Image(systemName: "folder").foregroundStyle(Theme.Color.accent) },
+                                        leading: { Image(systemName: "folder").foregroundStyle(accent).accessibilityHidden(true) },
                                         trailing: {
                                             Image(systemName: "chevron.right")
                                                 .font(Theme.Font.mono).foregroundStyle(Theme.Color.faint)
@@ -57,7 +58,7 @@ struct ProjectsView: View {
                             }
                         }
                     }
-                }.padding(Theme.Space.lg)
+                }.padding(Theme.Space.lg).readableColumn()
             }
         }
     }
@@ -84,6 +85,7 @@ struct ProjectsView: View {
 struct ProjectWorkPackagesView: View {
     let project: OPProject
     @Environment(OPClient.self) private var client
+    @Environment(\.themeAccent) private var accent
     @State private var workPackages: [OPWorkPackage] = []
     @State private var loading = false
     @State private var loadRequest = UUID()
@@ -112,7 +114,7 @@ struct ProjectWorkPackagesView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: Theme.Space.lg) {
                 PromptHeader(["projects", project.identifier ?? "\(project.id)"])
-                Text(project.name ?? "(unnamed)")
+                Text(project.name ?? String(localized: "(unnamed)"))
                     .font(Theme.Font.display).foregroundStyle(Theme.Color.ink)
                 searchBar
                 if loading && workPackages.isEmpty {
@@ -128,9 +130,9 @@ struct ProjectWorkPackagesView: View {
                             ForEach(workPackages) { wp in
                                 Button { selected = wp } label: {
                                     ListRow(
-                                        title: wp.subject ?? "(no subject)",
+                                        title: wp.subject ?? String(localized: "(no subject)"),
                                         metadata: [wp.statusName, wp.typeName, wp.priorityName].compactMap { $0 }.joined(separator: " · "),
-                                        leading: { Image(systemName: "doc").foregroundStyle(Theme.Color.accent) },
+                                        leading: { Image(systemName: "doc").foregroundStyle(accent).accessibilityHidden(true) },
                                         trailing: {
                                             Image(systemName: "chevron.right")
                                                 .font(Theme.Font.mono).foregroundStyle(Theme.Color.faint)
@@ -144,7 +146,7 @@ struct ProjectWorkPackagesView: View {
                         }
                     }
                 }
-            }.padding(Theme.Space.lg)
+            }.padding(Theme.Space.lg).readableColumn()
         }
     }
 

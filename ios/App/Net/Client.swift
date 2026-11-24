@@ -30,11 +30,11 @@ public enum OPError: Error, LocalizedError {
     case versionConflict
     public var errorDescription: String? {
         switch self {
-        case .notConfigured:  "Set the base URL + API token in Settings."
-        case .http(let s, _): "Server returned HTTP \(s)."
-        case .decoding(let m): "Couldn't decode response: \(m)."
-        case .transport(let m): "Network error: \(m)."
-        case .versionConflict: "Item changed on the server — refresh and retry."
+        case .notConfigured:  String(localized: "Set the base URL + API token in Settings.")
+        case .http(let s, _): String(localized: "Server returned HTTP \(s).")
+        case .decoding(let m): String(localized: "Couldn't decode response: \(sentence(m))")
+        case .transport(let m): String(localized: "Network error: \(sentence(m))")
+        case .versionConflict: String(localized: "Item changed on the server — refresh and retry.")
         }
     }
 }
@@ -214,7 +214,7 @@ public final class OPClient {
             : cfg.baseURL.absoluteString
         let separator = path.hasPrefix("/") ? "" : "/"
         guard let full = URL(string: trimmedBase + separator + path) else {
-            throw OPError.transport("Couldn't build URL from \(trimmedBase)\(separator)\(path)")
+            throw OPError.transport(String(localized: "Couldn't build URL from \(trimmedBase)\(separator)\(path)"))
         }
         var req = URLRequest(url: full)
         req.httpMethod = method
@@ -257,10 +257,15 @@ public final class OPClient {
     }
 
     private static func checkResponse(_ response: URLResponse, data: Data) throws {
-        guard let http = response as? HTTPURLResponse else { throw OPError.transport("No HTTP response") }
+        guard let http = response as? HTTPURLResponse else { throw OPError.transport(String(localized: "No HTTP response")) }
         guard (200..<300).contains(http.statusCode) else {
             throw OPError.http(status: http.statusCode,
                                body: String(data: data, encoding: .utf8))
         }
     }
+}
+
+/// A system message as one sentence: adds a final period only when the message has none.
+private func sentence(_ message: String) -> String {
+    message.hasSuffix(".") ? message : message + "."
 }

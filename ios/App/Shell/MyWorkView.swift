@@ -5,6 +5,7 @@ import SwiftUI
 
 struct MyWorkView: View {
     @Environment(OPClient.self) private var client
+    @Environment(\.themeAccent) private var accent
     @State private var workPackages: [OPWorkPackage] = []
     @State private var loading = false
     @State private var loadRequest = UUID()
@@ -46,7 +47,7 @@ struct MyWorkView: View {
                     Text("Assigned to me")
                         .font(Theme.Font.display).foregroundStyle(Theme.Color.ink)
                     list
-                }.padding(Theme.Space.lg)
+                }.padding(Theme.Space.lg).readableColumn()
             }
         }
     }
@@ -57,7 +58,7 @@ struct MyWorkView: View {
                 ForEach(workPackages) { wp in
                     Button { selected = wp } label: {
                         ListRow(
-                            title: wp.subject ?? "(no subject)",
+                            title: wp.subject ?? String(localized: "(no subject)"),
                             metadata: subtitle(wp),
                             leading: { statusGlyph(wp) },
                             trailing: {
@@ -87,7 +88,7 @@ struct MyWorkView: View {
             default:                "circle"
             }
         }()
-        return Image(systemName: symbol).foregroundStyle(Theme.Color.accent)
+        return Image(systemName: symbol).foregroundStyle(accent).accessibilityHidden(true)
     }
 
     private func load() async {

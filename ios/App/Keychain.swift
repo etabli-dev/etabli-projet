@@ -15,8 +15,8 @@ public enum Keychain {
         case encoding
         public var errorDescription: String? {
             switch self {
-            case .osStatus(let s): return "Keychain error (status \(s))."
-            case .encoding:        return "Couldn't encode credential as UTF-8."
+            case .osStatus(let s): return String(localized: "Keychain error (status \(s)).")
+            case .encoding:        return String(localized: "Couldn't encode credential as UTF-8.")
             }
         }
     }

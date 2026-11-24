@@ -6,6 +6,8 @@
 
 Android lists projects and work packages assigned to you. iOS additionally browses a project’s work packages, searches within a project and edits work-package subjects with optimistic lock-version handling. Assignment changes are not implemented. Lists currently request up to 200 projects and 100 work packages in the screens; further UI pagination is deferred.
 
+Appearance (iOS, Settings → Appearance): app language (System/Deutsch/English; the iOS app is fully translated into German), System/Light/Dark and accent colour; default Hugo Coder palette.
+
 ## Availability
 
 Établi Projet is **under active development**. There are no App Store, Google Play or F-Droid releases yet.
@@ -73,7 +75,8 @@ python3 scripts/check_swift.py
 ```
 
 These checks compile the production client/transport/Keychain wrapper, exercise
-the client using isolated in-memory credentials and HTTP protocol fixtures, and
+the client using isolated in-memory credentials and HTTP protocol fixtures,
+check the appearance model (stored-value fallback, colour table, contrast) and
 parse the SwiftUI sources. They do not establish a complete iOS build or a real
 server connection. Android TLS fixtures use normal trust validation with a local
 test certificate. See [the refinement record](docs/refinement-2026-10.md).

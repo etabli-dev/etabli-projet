@@ -28,14 +28,14 @@ struct WorkPackageDetailView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: Theme.Space.lg) {
                         header
-                        if let info { StatusLabel(info, tone: .accent) }
+                        if let info { StatusLabel(info, tone: .success) }
                         if let error {
                             Text(error).font(Theme.Font.body).foregroundStyle(Theme.Color.danger)
                         }
                         subjectCard
                         metaCard
                         descriptionCard
-                    }.padding(Theme.Space.lg)
+                    }.padding(Theme.Space.lg).readableColumn()
                 }
             }
             .toolbar {
@@ -50,7 +50,7 @@ struct WorkPackageDetailView: View {
     private var header: some View {
         VStack(alignment: .leading, spacing: Theme.Space.xs) {
             MonoLabel("WP #\(wp.id)", color: Theme.Color.faint)
-            Text(wp.subject ?? "(no subject)")
+            Text(wp.subject ?? String(localized: "(no subject)"))
                 .font(Theme.Font.display).foregroundStyle(Theme.Color.ink)
         }
     }
@@ -96,7 +96,7 @@ struct WorkPackageDetailView: View {
         }
     }
 
-    private func row(_ key: String, _ value: String?) -> some View {
+    private func row(_ key: LocalizedStringKey, _ value: String?) -> some View {
         HStack {
             MonoLabel(key, color: Theme.Color.faint)
             Spacer()
@@ -106,7 +106,7 @@ struct WorkPackageDetailView: View {
 
     private func save() async {
         guard let lockVersion = wp.lockVersion else {
-            error = "Server didn't return a lockVersion; can't safely patch."
+            error = String(localized: "Server didn't return a lockVersion; can't safely patch.")
             return
         }
         saving = true; error = nil; info = nil
@@ -117,10 +117,10 @@ struct WorkPackageDetailView: View {
                                                         newSubject: subject)
             wp = updated
             onUpdated(updated)
-            info = "Saved."
+            info = String(localized: "Saved.")
         } catch OPError.versionConflict {
             // Re-fetch and let the user retry from a clean lockVersion.
-            info = "This work package was changed elsewhere — refreshed to latest."
+            info = String(localized: "This work package was changed elsewhere — refreshed to latest.")
             do {
                 let fresh = try await client.fetchWorkPackage(id: wp.id)
                 wp = fresh

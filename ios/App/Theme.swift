@@ -14,33 +14,43 @@ import UIKit
 //                 instead of heavy shadows.
 //   - Typography: system monospace for titles, IDs, timestamps, numbers,
 //                 status labels; system default for body prose.
-//   - Color:      one restrained teal-green accent (#28A745 ≈ Hugo Coder
-//                 default), neutral grays otherwise.
+//   - Color:      Hugo Coder palette (AppearanceModel.swift) and one accent
+//                 the user chooses (default Coder blue); views read it from
+//                 `@Environment(\.themeAccent)`, never a fixed colour.
 //   - Modes:      light + dark via UITraitCollection, plus a persisted
-//                 in-app override (Auto / Light / Dark).
+//                 in-app override (System / Light / Dark, Appearance.swift).
 
 public enum Theme {
 
     public enum Color {
+        // Hugo Coder neutrals (CoderPalette: luizdepra/hugo-coder
+        // assets/scss/_variables.scss @ v0.0.0-20260305123245-3d3bbd75d7bb).
         // Foreground
-        public static let ink     = dynamic(hex(0x1A1A1A), hex(0xE6E6E6))
-        public static let faint   = dynamic(hex(0x6B6B6B), hex(0x8A9298))
+        public static let ink     = dynamic(hex(CoderPalette.foregroundLight), hex(CoderPalette.foregroundDark))
+        // Secondary text: Material grey 700 / 400, at least 4.5:1 on paper and surface.
+        public static let faint   = dynamic(hex(0x616161), hex(0xBDBDBD))
 
         // Backgrounds
-        public static let paper   = dynamic(hex(0xFBFBF9), hex(0x14171A))
-        public static let surface = dynamic(hex(0xFFFFFF), hex(0x1B1F23))
+        public static let paper   = dynamic(hex(CoderPalette.backgroundLight), hex(CoderPalette.backgroundDark))
+        public static let surface = dynamic(hex(CoderPalette.surfaceLight), hex(CoderPalette.surfaceDark))
 
-        // Single accent (Hugo Coder green)
-        public static let accent      = dynamic(hex(0x28A745), hex(0x40C463))
-        public static let accentMuted = dynamic(hex(0x28A745, alpha: 0.14),
-                                                hex(0x40C463, alpha: 0.20))
+        // Text and symbols on an accent, warn or danger fill.
+        public static let onAccent = dynamic(hex(CoderPalette.onAccentLight), hex(CoderPalette.onAccentDark))
 
-        // State
-        public static let warn   = dynamic(hex(0x8A6D3B), hex(0xC9A35B))
-        public static let danger = dynamic(hex(0x9B3B3B), hex(0xD46A6A))
+        // The accent is the user's choice: views read `@Environment(\.themeAccent)`.
+        // Outside a view (no environment) the stored choice, read when called.
+        public static var storedAccent: SwiftUI.Color {
+            AccentChoice(stored: UserDefaults.standard.string(forKey: AppearancePreference.accentKey)).color
+        }
+
+        // State (semantic; does not follow the accent). At least 4.5:1 on
+        // paper and surface, and with onAccent on a fill.
+        public static let success = dynamic(hex(0x1B5E20), hex(0x81C784))
+        public static let warn    = dynamic(hex(0x805300), hex(0xFFCA28))
+        public static let danger  = dynamic(hex(0x9B3B3B), hex(0xEF9A9A))
 
         // Structure
-        public static let hairline = dynamic(hex(0xE2E6E5), hex(0x2A2F34))
+        public static let hairline = dynamic(hex(CoderPalette.borderLight), hex(CoderPalette.borderDark))
     }
 
     public enum Font {
@@ -67,32 +77,29 @@ public enum Theme {
         public static let sm: CGFloat = 6
         public static let md: CGFloat = 10
     }
+
+    public enum Layout {
+        /// Widest single-column content (iPad, landscape); phones use their full width.
+        public static let readable: CGFloat = 720
+    }
 }
 
-// MARK: - Persisted theme preference (Auto / Light / Dark)
-
-public enum ThemePreference: String, CaseIterable, Identifiable, Sendable {
-    case system, light, dark
-    public var id: String { rawValue }
-    public static let userDefaultsKey = "coder.theme.preference"
-    public var label: String {
-        switch self { case .system: "Auto"; case .light: "Light"; case .dark: "Dark" }
-    }
-    public var systemImage: String {
-        switch self {
-        case .system: "circle.lefthalf.filled"
-        case .light:  "sun.max"
-        case .dark:   "moon"
-        }
-    }
-    public var colorScheme: ColorScheme? {
-        switch self { case .system: nil; case .light: .light; case .dark: .dark }
+public extension View {
+    /// Centres a single-column screen at `Theme.Layout.readable` instead of stretching it across an iPad.
+    func readableColumn() -> some View {
+        frame(maxWidth: Theme.Layout.readable, alignment: .leading)
+            .frame(maxWidth: .infinity)
     }
 }
 
 // MARK: - Shared styled components
+//
+// Like `Text`, the components take a string literal as a localized key (looked up in Localizable.xcstrings with the
+// environment's locale, so the in-app language applies at once) and a `String` value verbatim (user content,
+// server messages, values already localized with `String(localized:)`).
 
 public struct PromptHeader<Trailing: View>: View {
+    @Environment(\.themeAccent) private var accent
     public let segments: [String]
     public let trailing: Trailing
     public init(_ segments: [String], @ViewBuilder trailing: () -> Trailing) {
@@ -100,7 +107,7 @@ public struct PromptHeader<Trailing: View>: View {
     }
     public var body: some View {
         HStack(spacing: 0) {
-            Text("~/").font(Theme.Font.monoBody).foregroundStyle(Theme.Color.accent)
+            Text("~/").font(Theme.Font.monoBody).foregroundStyle(accent)
             ForEach(Array(segments.enumerated()), id: \.offset) { idx, seg in
                 if idx > 0 {
                     Text("/").font(Theme.Font.monoBody).foregroundStyle(Theme.Color.faint)
@@ -111,7 +118,7 @@ public struct PromptHeader<Trailing: View>: View {
             trailing
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Path: " + (["~"] + segments).joined(separator: "/"))
+        .accessibilityLabel(Text("Path: \((["~"] + segments).joined(separator: "/"))"))
     }
 }
 public extension PromptHeader where Trailing == EmptyView {
@@ -119,27 +126,38 @@ public extension PromptHeader where Trailing == EmptyView {
 }
 
 public struct MonoLabel: View {
-    let text: String; let color: SwiftUI.Color
-    public init(_ text: String, color: SwiftUI.Color = Theme.Color.ink) {
-        self.text = text; self.color = color
+    let text: Text; let color: SwiftUI.Color
+    public init(_ key: LocalizedStringKey, color: SwiftUI.Color = Theme.Color.ink) {
+        self.text = Text(key); self.color = color
+    }
+    @_disfavoredOverload
+    public init<S: StringProtocol>(_ text: S, color: SwiftUI.Color = Theme.Color.ink) {
+        self.text = Text(text); self.color = color
     }
     public var body: some View {
-        Text(text).font(Theme.Font.mono).foregroundStyle(color)
+        text.font(Theme.Font.mono).foregroundStyle(color)
     }
 }
 
 public struct Card<Content: View>: View {
-    let title: String; let systemImage: String?; let content: Content
-    public init(title: String, systemImage: String? = nil, @ViewBuilder content: () -> Content) {
-        self.title = title; self.systemImage = systemImage; self.content = content()
+    @Environment(\.themeAccent) private var accent
+    let title: Text; let systemImage: String?; let content: Content
+    public init(title: LocalizedStringKey, systemImage: String? = nil, @ViewBuilder content: () -> Content) {
+        self.title = Text(title); self.systemImage = systemImage; self.content = content()
+    }
+    @_disfavoredOverload
+    public init<S: StringProtocol>(title: S, systemImage: String? = nil, @ViewBuilder content: () -> Content) {
+        self.title = Text(title); self.systemImage = systemImage; self.content = content()
     }
     public var body: some View {
         VStack(alignment: .leading, spacing: Theme.Space.md) {
             HStack(spacing: Theme.Space.xs) {
                 if let systemImage {
-                    Image(systemName: systemImage).foregroundStyle(Theme.Color.accent)
+                    Image(systemName: systemImage).foregroundStyle(accent)
+                        .accessibilityHidden(true)
                 }
-                Text(title).font(Theme.Font.headline).foregroundStyle(Theme.Color.ink)
+                title.font(Theme.Font.headline).foregroundStyle(Theme.Color.ink)
+                    .accessibilityAddTraits(.isHeader)
             }
             content
         }
@@ -153,23 +171,30 @@ public struct Card<Content: View>: View {
 }
 
 public struct PrimaryButton: View {
-    let title: String; let systemImage: String?; let action: () -> Void
+    @Environment(\.themeAccent) private var accent
+    let title: Text; let systemImage: String?; let action: () -> Void
     let enabled: Bool
-    public init(_ title: String, systemImage: String? = nil, enabled: Bool = true,
+    public init(_ title: LocalizedStringKey, systemImage: String? = nil, enabled: Bool = true,
                 action: @escaping () -> Void) {
-        self.title = title; self.systemImage = systemImage
+        self.title = Text(title); self.systemImage = systemImage
+        self.enabled = enabled; self.action = action
+    }
+    @_disfavoredOverload
+    public init<S: StringProtocol>(_ title: S, systemImage: String? = nil, enabled: Bool = true,
+                                   action: @escaping () -> Void) {
+        self.title = Text(title); self.systemImage = systemImage
         self.enabled = enabled; self.action = action
     }
     public var body: some View {
         Button(action: action) {
             HStack(spacing: Theme.Space.sm) {
                 if let systemImage { Image(systemName: systemImage) }
-                Text(title).font(Theme.Font.body.weight(.semibold))
+                title.font(Theme.Font.body.weight(.semibold))
             }
             .padding(.horizontal, Theme.Space.md)
             .padding(.vertical, Theme.Space.sm)
-            .foregroundStyle(Theme.Color.surface)
-            .background(enabled ? Theme.Color.accent : Theme.Color.faint)
+            .foregroundStyle(Theme.Color.onAccent)
+            .background(enabled ? accent : Theme.Color.faint)
             .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.sm, style: .continuous))
         }
         .buttonStyle(.plain)
@@ -178,11 +203,14 @@ public struct PrimaryButton: View {
 }
 
 public struct StatusLabel: View {
-    public enum Tone { case info, accent, warn, danger }
-    let text: String; let tone: Tone
-    public init(_ text: String, tone: Tone = .info) { self.text = text; self.tone = tone }
+    @Environment(\.themeAccent) private var accent
+    public enum Tone { case info, accent, success, warn, danger }
+    let text: Text; let tone: Tone
+    public init(_ key: LocalizedStringKey, tone: Tone = .info) { self.text = Text(key); self.tone = tone }
+    @_disfavoredOverload
+    public init<S: StringProtocol>(_ text: S, tone: Tone = .info) { self.text = Text(text); self.tone = tone }
     public var body: some View {
-        Text(text)
+        text
             .font(Theme.Font.mono)
             .foregroundStyle(foreground)
             .padding(.horizontal, Theme.Space.xs)
@@ -195,15 +223,17 @@ public struct StatusLabel: View {
     private var foreground: SwiftUI.Color {
         switch tone {
         case .info:   Theme.Color.ink
-        case .accent: Theme.Color.surface
-        case .warn:   Theme.Color.surface
-        case .danger: Theme.Color.surface
+        case .accent: Theme.Color.onAccent
+        case .success: Theme.Color.onAccent
+        case .warn:   Theme.Color.onAccent
+        case .danger: Theme.Color.onAccent
         }
     }
     private var background: SwiftUI.Color {
         switch tone {
         case .info:   Theme.Color.paper
-        case .accent: Theme.Color.accent
+        case .accent: accent
+        case .success: Theme.Color.success
         case .warn:   Theme.Color.warn
         case .danger: Theme.Color.danger
         }
@@ -242,11 +272,11 @@ public extension ListRow where Trailing == EmptyView {
 }
 
 public struct LoadingState: View {
-    let title: String
-    public init(_ title: String = "loading…") { self.title = title }
+    let title: LocalizedStringKey
+    public init(_ title: LocalizedStringKey = "loading…") { self.title = title }
     public var body: some View {
         VStack(spacing: Theme.Space.sm) {
-            ProgressView().tint(Theme.Color.accent)
+            ProgressView()
             MonoLabel(title, color: Theme.Color.faint)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -255,16 +285,21 @@ public struct LoadingState: View {
 }
 
 public struct EmptyState: View {
-    let title: String; let detail: String?; let systemImage: String
-    public init(title: String, detail: String? = nil, systemImage: String = "tray") {
-        self.title = title; self.detail = detail; self.systemImage = systemImage
+    let title: LocalizedStringKey; let detail: Text?; let systemImage: String
+    public init(title: LocalizedStringKey, detail: LocalizedStringKey? = nil, systemImage: String = "tray") {
+        self.title = title; self.detail = detail.map { Text($0) }; self.systemImage = systemImage
+    }
+    @_disfavoredOverload
+    public init(title: LocalizedStringKey, detail: String?, systemImage: String = "tray") {
+        self.title = title; self.detail = detail.map { Text($0) }; self.systemImage = systemImage
     }
     public var body: some View {
         VStack(spacing: Theme.Space.md) {
             Image(systemName: systemImage).font(.title2).foregroundStyle(Theme.Color.faint)
+                .accessibilityHidden(true)
             Text(title).font(Theme.Font.headline).foregroundStyle(Theme.Color.ink)
             if let detail {
-                MonoLabel(detail, color: Theme.Color.faint).multilineTextAlignment(.center)
+                detail.font(Theme.Font.mono).foregroundStyle(Theme.Color.faint).multilineTextAlignment(.center)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -273,17 +308,22 @@ public struct EmptyState: View {
 }
 
 public struct ErrorState: View {
-    let title: String; let detail: String?; let retry: (() -> Void)?
-    public init(title: String, detail: String? = nil, retry: (() -> Void)? = nil) {
-        self.title = title; self.detail = detail; self.retry = retry
+    let title: LocalizedStringKey; let detail: Text?; let retry: (() -> Void)?
+    public init(title: LocalizedStringKey, detail: LocalizedStringKey? = nil, retry: (() -> Void)? = nil) {
+        self.title = title; self.detail = detail.map { Text($0) }; self.retry = retry
+    }
+    @_disfavoredOverload
+    public init(title: LocalizedStringKey, detail: String?, retry: (() -> Void)? = nil) {
+        self.title = title; self.detail = detail.map { Text($0) }; self.retry = retry
     }
     public var body: some View {
         VStack(spacing: Theme.Space.md) {
             Image(systemName: "exclamationmark.triangle")
                 .font(.title2).foregroundStyle(Theme.Color.danger)
+                .accessibilityHidden(true)
             Text(title).font(Theme.Font.headline).foregroundStyle(Theme.Color.ink)
             if let detail {
-                MonoLabel(detail, color: Theme.Color.faint).multilineTextAlignment(.center)
+                detail.font(Theme.Font.mono).foregroundStyle(Theme.Color.faint).multilineTextAlignment(.center)
             }
             if let retry {
                 PrimaryButton("Retry", systemImage: "arrow.clockwise", action: retry)

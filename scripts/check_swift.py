@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Typecheck production Foundation code and exercise clients without real credentials."""
+"""Typecheck production Foundation code, exercise clients without real credentials, check the appearance model."""
 from pathlib import Path
 import subprocess
 import tempfile
@@ -13,4 +13,8 @@ subprocess.run(['swiftc', '-frontend', '-parse', *map(str, (root / 'ios').rglob(
 with tempfile.TemporaryDirectory(prefix='etabli-client-') as temporary:
     executable = str(Path(temporary) / 'check')
     subprocess.run(['swiftc', *map(str, files), str(root / 'scripts/ClientFixtures.swift'), str(root / 'scripts/check_client.swift'), '-o', executable], check=True)
+    subprocess.run([executable], check=True)
+with tempfile.TemporaryDirectory(prefix='etabli-appearance-') as temporary:
+    executable = str(Path(temporary) / 'check')
+    subprocess.run(['swiftc', str(root / 'ios/App/AppearanceModel.swift'), str(root / 'scripts/check_appearance.swift'), '-o', executable], check=True)
     subprocess.run([executable], check=True)

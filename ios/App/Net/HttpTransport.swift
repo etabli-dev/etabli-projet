@@ -28,9 +28,12 @@ struct StoredConnection: Codable {
 func secureServer(_ url: URL) throws -> URL {
     guard url.scheme?.lowercased() == "https", url.host?.isEmpty == false,
           url.user == nil, url.password == nil, url.query == nil, url.fragment == nil else {
-        throw ClientHTTPError.invalid("Use an HTTPS server URL without credentials, query or fragment")
+        throw ClientHTTPError.invalid(String(localized: "Use an HTTPS server URL without credentials, query or fragment"))
     }
-    return URL(string: url.absoluteString.trimmingCharacters(in: CharacterSet(charactersIn: "/")))!
+    guard let trimmed = URL(string: url.absoluteString.trimmingCharacters(in: CharacterSet(charactersIn: "/"))) else {
+        throw ClientHTTPError.invalid(String(localized: "Use an HTTPS server URL without credentials, query or fragment"))
+    }
+    return trimmed
 }
 
 final class ClientHTTP: @unchecked Sendable {
@@ -39,7 +42,7 @@ final class ClientHTTP: @unchecked Sendable {
     private func prepare(_ request: URLRequest) throws -> URLRequest {
         try Task.checkCancellation()
         guard let url = request.url, url.scheme?.lowercased() == "https", url.user == nil, url.password == nil else {
-            throw ClientHTTPError.invalid("Authenticated requests require HTTPS")
+            throw ClientHTTPError.invalid(String(localized: "Authenticated requests require HTTPS"))
         }
         var copy = request; copy.timeoutInterval = min(request.timeoutInterval, 45)
         return copy
@@ -117,7 +120,7 @@ private final class ClientTransfer: NSObject, URLSessionDataDelegate, @unchecked
             completionHandler(.cancel); finish(.failure(URLError(.badServerResponse))); return
         }
         if response.expectedContentLength > limit {
-            completionHandler(.cancel); finish(.failure(ClientHTTPError.invalid("Response exceeds allowed size"))); return
+            completionHandler(.cancel); finish(.failure(ClientHTTPError.invalid(String(localized: "Response exceeds allowed size")))); return
         }
         lock.lock(); self.response = http; lock.unlock()
         completionHandler(.allow)
@@ -126,7 +129,7 @@ private final class ClientTransfer: NSObject, URLSessionDataDelegate, @unchecked
         lock.lock()
         guard completed == nil else { lock.unlock(); return }
         if data.count > limit - count {
-            lock.unlock(); finish(.failure(ClientHTTPError.invalid("Response exceeds allowed size"))); return
+            lock.unlock(); finish(.failure(ClientHTTPError.invalid(String(localized: "Response exceeds allowed size")))); return
         }
         do {
             if let sink { try sink.write(contentsOf: data) } else { body.append(data) }
